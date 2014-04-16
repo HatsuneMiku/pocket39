@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>pocket39 by HatsuneMiku</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>pocket39</h1>
+        <h2>pocket39</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/HatsuneMiku/pocket39/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/HatsuneMiku/pocket39/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/HatsuneMiku/pocket39" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a name="pocket39" class="anchor" href="#pocket39"><span class="octicon octicon-link"></span></a>Pocket39</h1>
+
+<h2>
+<a name="pocket-miku" class="anchor" href="#pocket-miku"><span class="octicon octicon-link"></span></a>Pocket Miku</h2>
+
+<ul>
+<li>ポケット・ミク <a href="http://otonanokagaku.net/nsx39/">NSX-39</a>
+</li>
+</ul><h2>
+<a name="%E3%81%AA%E3%81%AB%E3%81%93%E3%82%8C" class="anchor" href="#%E3%81%AA%E3%81%AB%E3%81%93%E3%82%8C"><span class="octicon octicon-link"></span></a>なにこれ？</h2>
+
+<p>ポケット・ミク ( <a href="http://otonanokagaku.net/nsx39/">NSX-39</a> ) にひらがなで書いたテキストを読んで(歌って)もらうソフトです。</p>
+
+<p>コンパイルには <a href="http://www.digitalmars.com/d/download.html">dmc</a> が必要です。</p>
+
+<p>開発は dmc 8.42n / Windows 8 で動作確認していますが、 Windows XP / Vista / 7 / 8.1 でも動くと思います。</p>
+
+<p>(今は Windows 用のコードしかありませんが、将来別の環境でも作るかも。)</p>
+
+<p>※ cmd.exe を UTF-8 が使える状態で起動してください。参照 ( <a href="http://nazochu.blogspot.jp/2011/08/blog-post_26.html">コマンドプロンプトでUTF-8を表示</a> )</p>
+
+<h2>
+<a name="%E3%81%86%E3%81%9F%E3%81%84%E3%81%8B%E3%81%9F" class="anchor" href="#%E3%81%86%E3%81%9F%E3%81%84%E3%81%8B%E3%81%9F"><span class="octicon octicon-link"></span></a>うたいかた</h2>
+
+<pre><code>&gt; pocket39
+きょうは、ぽけっとみくのつかいかたをせつめいします。
+ぽけみくは、おおえすのひょうじゅんにゅうりょくを、よみあげます。
+つまりこういうことです。
+^Z
+&gt; echo みくだよ | pocket39
+&gt; pocket39
+おんていもつけられます。 / CDEFGAB[CDC]B
+うたうこともできます。
+^Z
+&gt; pocket39 &lt; fuji3.p39
+</code></pre>
+
+<h2>
+<a name="%E3%82%82%E3%81%8F%E3%81%B2%E3%82%87%E3%81%86" class="anchor" href="#%E3%82%82%E3%81%8F%E3%81%B2%E3%82%87%E3%81%86"><span class="octicon octicon-link"></span></a>もくひょう</h2>
+
+<ul>
+<li>マニュアル作る</li>
+<li>パラメータの最大値チェック</li>
+<li>初期化時の MIDI Message (ボリューム等)</li>
+<li>開始前の無音期間指定</li>
+<li>RPN とか CC 送る？ (ミクの声は pitch bend sensitivity のデフォルト値が違う)</li>
+<li>ベロシティも各音または任意の位置で指定出来るようにしたい</li>
+<li>pitch bend の時の前の音との繋がりを考慮して envelope 出力する</li>
+<li>Sleep() でタイミングが適当なので FIFO 経由して timer thread で出力する予定</li>
+<li>note off は毎回ちゃんと送るべき？</li>
+<li>NSX-39 の検索が適当で Device 1 優先にしてるだけなので治す</li>
+<li>SMF ファイルの出力 あるいは .SMF &lt;-&gt; .p39 コンバータ造る</li>
+<li>声以外の楽器にも対応したい (ここまでするなら素直に MIDI コントローラで・・・)</li>
+<li>オフセット指定サポートで曲全体のキーを変えられるような・・・</li>
+<li>歌詞と楽譜を一音ずつ混在する記述「あC240いE120うG60」をサポート予定</li>
+<li>音の長さを「ー」の数で指定するとか</li>
+<li>あとで com サーバーにしてみる</li>
+<li>たぶんバグいっぱい</li>
+</ul><h2>
+<a name="%E3%81%B3%E3%81%93%E3%81%86%E3%82%89%E3%82%93" class="anchor" href="#%E3%81%B3%E3%81%93%E3%81%86%E3%82%89%E3%82%93"><span class="octicon octicon-link"></span></a>びこうらん</h2>
+
+<ul>
+<li>pocket39.py はテスト用です。参照 ( <a href="http://openmidiproject.sourceforge.jp/">OpenMIDI project</a> )</li>
+<li>BSD license</li>
+</ul>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
