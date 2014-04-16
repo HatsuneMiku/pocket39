@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 '''
-DLLs from OpenMIDI project
+DLLs from OpenMIDI project http://openmidiproject.sourceforge.jp/
 C:\prj\tools\python\MIDI
 
 mididatalib = ctypes.windll.LoadLibrary(r".\MIDIData.dll")
