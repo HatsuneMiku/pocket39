@@ -325,7 +325,8 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     u |= (sft + 32) << 8;
     u |= oct << 4;
     // velocity or pitch bend
-    u |= ((d != 'v' && d != 'p') ? 100 : ((num >= 0) ? num : (d == 'p' ? 64 : 100))) << 14;
+    u |= ((d != 'v' && d != 'p') ? 100 : \
+      ((num >= 0) ? num : (d == 'p' ? 64 : 100))) << 14;
     // length
     u |= ((d != 'v' && d != 'p') ? ((num >= 0) ? num : 120) : 120) << 21;
     *n++ = u;
@@ -354,9 +355,9 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     if(k == 7){ // 'R'
       if(idx == 0x80) ++v;
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
-      if(1) p39bend(p39, 0, 0, 0); // **** not sure
     }else{
       if(idx != 0xFF) ++v;
+      if(1) p39bend(p39, 0, 0, 0); // *** not sure
       p39->tone = 'A' + k;
       p39voice(p39, 0, idx);
       p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
@@ -377,8 +378,11 @@ int main(int ac, char **av)
 
 #if 1
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "--GECEG[C240]G GAGCE360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "", "FD]B=[DFB=240F FGF]B=[D360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
+    "--GECEG[C240]G GAGCE360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
+    "[FD]B=[DFB=240F FGF]B=[D360] R");
   p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
   p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
   p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
@@ -388,7 +392,8 @@ int main(int ac, char **av)
   p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
   p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
   p39sing(p39, "みく。", "[G60C60]R360");
-  p39sing(p39, "ほー、ほけきょ。けきょ。", "[G420R60G60[C60]C60R[C60]C60] R");
+  p39sing(p39, "ほー、ほけきょ。けきょ。けきょ。けきょ。",
+    "[G420R60G60[C60]C60R480 [C60]C60R60 [C60]C6R60 0[C60]C60R60] R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C] R");
   // test for unexpected character
 //  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
@@ -470,6 +475,11 @@ int main(int ac, char **av)
   p39sing(p39, "しほーの", "G360G120=0=0=240C240");
   p39sing(p39, "やまを", "A360#0#[C240]A240");
   p39sing(p39, "みおろして", "G360AG120=0=E120=0=C840R");
+  p39sing(p39, "かみなりさまを", "D360DD240D240C120#0#E120#G360R");
+  p39sing(p39, "したにきく", "A360B[C240]A240G840R");
+  p39sing(p39, "ふじは", "[C480]A240F240");
+  p39sing(p39, "にっぽん", "E360RA240G240");
+  p39sing(p39, "いちのやま", "F240E240D360CC840R");
 #endif
 
   p39close(p39);
