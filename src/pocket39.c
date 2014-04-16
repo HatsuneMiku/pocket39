@@ -117,6 +117,15 @@ UINT p39prepare(Pocket39 *p39)
   return 0;
 }
 
+UINT p39reset(Pocket39 *p39)
+{
+  UINT r;
+  assert(p39);
+  r = midiOutReset(p39->hMO);
+  assert(!r);
+  return 0;
+}
+
 Pocket39 *p39open()
 {
   UINT r;
@@ -138,16 +147,9 @@ Pocket39 *p39open()
     p39->bend = 4095;
   }
   assert(!r);
-  return p39;
-}
-
-UINT p39reset(Pocket39 *p39)
-{
-  UINT r;
-  assert(p39);
-  r = midiOutReset(p39->hMO);
+  r = p39reset(p39);
   assert(!r);
-  return 0;
+  return p39;
 }
 
 UINT p39close(Pocket39 *p39)
@@ -276,7 +278,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     for(v = voice_buf; *v != 0xFF; ){
       BYTE idx = *v++;
       if(idx & 0x80){
-        p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+        p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
       }else{
         p39voice(p39, 0, idx);
         p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
@@ -288,26 +290,18 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   do{
     BYTE d = *q++;
     UINT u = 0;
-    if(d >= 'A' && d <= 'G'){
-      u |= d - 'A'; // 0-6
-    }else if(d == 'R'){
-      u |= 7;
-    }else if(d == '+' || d == '-'){
-      u |= (d == '+') ? 8 : 9;
-    }else if(d == '#' || d == '='){
-      u |= (d == '#') ? 10 : 11;
-    }else if(d == 'v'){
-      u |= 12;
-    }else if(d == 'n'){
-      u |= 13;
-    }else if(d == '['){
-      u |= 14;
-      ++oct;
-    }else if(d == ']'){
-      u |= 15;
-      --oct;
+    if(d == ' '){                   u |= 13;
+    }else if(d >= 'A' && d <= 'G'){ u |= d - 'A'; // 0-6
+    }else if(d == 'R'){             u |= 7;
+    }else if(d == '+' || d == '-'){ u |= (d == '+') ? 8 : 9;
+    }else if(d == '#' || d == '='){ u |= (d == '#') ? 10 : 11;
+    }else if(d == 'v'){             u |= 12;
+    }else if(d == 'n'){             u |= 13;
+    }else if(d == '['){             u |= 14; ++oct;
+    }else if(d == ']'){             u |= 15; --oct;
     }else{
       u |= 13;
+      fprintf(stderr, "unexpected character [%c]\n", d);
     }
     if(u & 0x0F != 13){
       // q = process_number();
@@ -331,7 +325,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     else ++v;
     p39->oct = (*n >> 4) & 0x0F;
     if(k == 7){ // 'R'
-      p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+      p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
     }else{
       p39->tone = 'A' + k;
       p39voice(p39, 0, idx);
@@ -345,7 +339,6 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 int main(int ac, char **av)
 {
   Pocket39 *p39 = p39open();
-  p39reset(p39);
   p39programs(p39, default_banks, default_banks_len);
 
 #if 1
@@ -354,9 +347,13 @@ int main(int ac, char **av)
 
 #if 1
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "", "==GECEG[C240]G GAGCE360");
   p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
-  p39sing(p39, "てってってー、みく。", "G60R60G60R60G120R[C60C60]R");
+  p39sing(p39, "てってってー、", "G60R60G60R60G120R");
+  p39sing(p39, "てってっててー。", "G60R60G60R60G50R10G120R");
+  p39sing(p39, "みく。", "[G60C60]R");
+  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C]");
+  // test for unexpected character
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
 #endif
 
