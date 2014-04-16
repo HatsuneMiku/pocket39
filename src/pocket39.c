@@ -66,14 +66,14 @@ char pron[][7] = {
     "ゐ",   "ゑ",   "を",  "N\\",    "m",    "N",    "J",    "n",
   // aliases (offset 0x80 to pron_ext[])
   "づぁ", "づぃ",   "づ", "づぇ", "づぉ", "うぃ", "うぇ", "うぉ",
-    "ん",   "ー",   "っ",   "、",   "。"
+    "ん",   "っ",   "、",   "。",   "ー"
 };
 size_t pron_len = sizeof(pron) / sizeof(pron[0]);
 
 char pron_ext[] = {
   0x1A, 0x1B, 0x1C, 0x1D, 0x1E, // づぁ づぃ づ づぇ づぉ
   0x78, 0x79, 0x7A, 0x7B, // うぃ うぇ うぉ ん
-  0xFF, 0xFF, 0xFF, 0xFF // ー っ 、 。
+  0x80, 0x80, 0x80, 0xFF // っ 、 。 ー
 };
 size_t pron_ext_len = sizeof(pron_ext) / sizeof(pron_ext[0]);
 
@@ -235,10 +235,16 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     }
     p += strlen(pron[idx]);
 //    fprintf(stdout, "%08x %s\n", idx, pron[idx]);
-    if(idx & 0x80) if((idx = pron_ext[idx & 0x7F]) == 0xFF) continue;
-    p39voice(p39, 0, idx);
-    p39note(p39, 0, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
-    p39note(p39, 0, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+    if(idx & 0x80){
+      idx = pron_ext[idx & 0x7F];
+      if(idx == 0xFF) continue;
+    }
+    if(idx & 0x80){
+      p39note(p39, 0, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+    }else{
+      p39voice(p39, 0, idx);
+      p39note(p39, 0, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
+    }
   }while(*p);
   return 0;
 }
@@ -248,13 +254,18 @@ int main(int ac, char **av)
   Pocket39 *p39 = p39open();
   p39reset(p39);
   p39programs(p39, default_banks, default_banks_len);
-  p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
 
-  p39sing(p39, "きしゃのきしゃがきしゃできしゃした", "");
-  p39sing(p39, "", "GECEGA240G GAGCD360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEGA240G GAGCD360");
-  p39sing(p39, "てってってーみく", "G60R60F60R60E120D60C60");
+#if 1
+  p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
+#endif
+
+#if 1
+  p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
+  p39sing(p39, "", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "てってってー、みく。", "G60R60G60R60G120R[C60C60]R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
+#endif
 
 #if 0
   p39voice(p39, 0, 0x00);
@@ -325,12 +336,14 @@ int main(int ac, char **av)
   p39note(p39, 0, 1, 'C', 0, 4, 100, 840);
 #endif
 
+#if 1
   p39sing(p39, "あたまを", "G360GA240G240");
   p39sing(p39, "くもの", "E240C120#0#E360R");
   p39sing(p39, "うえにだし", "D360GG240F120=D840R");
   p39sing(p39, "しほーの", "G360G120=0=0=240C240");
   p39sing(p39, "やまを", "A360#0#[C240]A240");
   p39sing(p39, "みおろして", "G360AG120=0=E120=0=C840R");
+#endif
 
   p39close(p39);
   return 0;
