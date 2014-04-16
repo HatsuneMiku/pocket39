@@ -383,6 +383,8 @@ int main(int ac, char **av)
     "--GECEG[C240]G GAGCE360");
   p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
     "[FD]B=[DFB=240F FGF]B=[D360] R");
+  p39sing(p39, "", "D60R60D60R60D120R60");
+  p39sing(p39, "", "G60R60G60R60G55R5G120R");
   p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
   p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
   p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
@@ -391,6 +393,8 @@ int main(int ac, char **av)
   p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
   p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
   p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
+  p39sing(p39, "", "E60R60E60R60E120R60");
+  p39sing(p39, "", "A60R60A60R60A55R5A120R");
   p39sing(p39, "みく。", "[G60C60]R360");
   p39sing(p39, "ほー、ほけきょ。けきょ。けきょ。けきょ。",
     "[G420R60G60[C60]C60R480 [C60]C60R60 [C60]C6R60 0[C60]C60R60] R");
