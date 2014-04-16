@@ -75,8 +75,19 @@ char pron_ext[] = {
   0x78, 0x79, 0x7A, 0x7B, // うぃ うぇ うぉ ん
   0xFF, 0xFF, 0xFF, 0xFF // ー っ 、 。
 };
+size_t pron_ext_len = sizeof(pron_ext) / sizeof(pron_ext[0]);
 
 UINT pron_match[sizeof(pron) / sizeof(pron[0])] = {0};
+
+BYTE p39pron_scan(char *lyric)
+{
+  int i;
+  for(i = 0; i < pron_len; ++i){
+    int idx = pron_match[i];
+    if(!strncmp(lyric, pron[idx], strlen(pron[idx]))) return (BYTE)idx;
+  }
+  return 0xFF;
+}
 
 UINT p39prepare(Pocket39 *p39)
 {
@@ -214,7 +225,20 @@ UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 
 UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 {
+  char *p = lyrics;
   fprintf(stdout, "%s / %s\n", lyrics, notes);
+  do{
+    BYTE idx = p39pron_scan(p);
+    if(idx == 0xFF){
+      ++p;
+      continue;
+    }
+    p += strlen(pron[idx]);
+    if(idx & 0x80) if((idx = pron_ext[idx & 0x7F]) == 0xFF) continue;
+    p39voice(p39, 0, idx);
+    p39note(p39, 0, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
+    p39note(p39, 0, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+  }while(*p);
   return 0;
 }
 
@@ -225,6 +249,9 @@ int main(int ac, char **av)
   p39programs(p39, default_banks, default_banks_len);
   p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
 
+  p39sing(p39, "てってってーみく", "GFEDC");
+
+#if 0
   p39voice(p39, 0, 0x00);
   p39note(p39, 0, 1, 'G', 0, 4, 100, 360);
   p39voice(p39, 0, 0x29);
@@ -291,6 +318,7 @@ int main(int ac, char **av)
   p39note(p39, 0, 1, 'D', 0, 4, 100, 120);
   p39voice(p39, 0, 0x2C);
   p39note(p39, 0, 1, 'C', 0, 4, 100, 840);
+#endif
 
   p39sing(p39, "あたまを", "G360GA240G240");
   p39sing(p39, "くもの", "E240C120#0#E360R");
