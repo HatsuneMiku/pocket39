@@ -365,6 +365,7 @@ int main(int ac, char **av)
   p39sing(p39, "てってってー、", "G60R60G60R60G120R");
   p39sing(p39, "てってっててー。", "G60R60G60R60G50R10G120R");
   p39sing(p39, "みく。", "[G60C60]R");
+  p39sing(p39, "ほー、ほけきょ。けきょ。", "[G420R60G60[C60]C60R[C60]C60] R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C] R");
   // test for unexpected character
 //  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
