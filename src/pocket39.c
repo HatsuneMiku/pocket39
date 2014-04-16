@@ -234,11 +234,12 @@ UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
   return 0;
 }
 
-char *p39process_number(Pocket39 *p39, int *num, char *p)
+int p39get_number(char **p)
 {
-  *num = 0;
-  while(*p >= '0' && *p <= '9') *num = *num * 10 + *p++ - '0';
-  return p;
+  int num = 0;
+  if(**p < '0' || **p > '9') return -1;
+  while(**p >= '0' && **p <= '9') num = num * 10 + *(*p)++ - '0';
+  return num;
 }
 
 UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
@@ -319,13 +320,14 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       fprintf(stderr, "unexpected character [%c]\n", d);
       continue;
     }
-    q = p39process_number(p39, &num, q);
+    num = p39get_number(&q);
 //    if(num) fprintf(stdout, "%d\n", num);
     u |= (sft + 32) << 8;
     u |= oct << 4;
     // velocity or pitch bend
-    u |= ((d != 'v' && d != 'p') ? 100 : (num ? num : (d == 'p' ? 64 : 100))) << 14;
-    u |= ((d != 'v' && d != 'p') ? (num ? num : 120) : 120) << 21; // length
+    u |= ((d != 'v' && d != 'p') ? 100 : ((num >= 0) ? num : (d == 'p' ? 64 : 100))) << 14;
+    // length
+    u |= ((d != 'v' && d != 'p') ? ((num >= 0) ? num : 120) : 120) << 21;
     *n++ = u;
   }while(*q);
   *n = 0xFF;
