@@ -378,9 +378,15 @@ int main(int ac, char **av)
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
   p39sing(p39, "", "--GECEG[C240]G GAGCE360");
   p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
-  p39sing(p39, "てってってー、", "G60R60G60R60G120R");
-  p39sing(p39, "てってっててー。", "G60R60G60R60G50R10G120R");
-  p39sing(p39, "みく。", "[G60C60]R");
+  p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
+  p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
+  p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
+  p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
+  p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
+  p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
+  p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
+  p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
+  p39sing(p39, "みく。", "[G60C60]R360");
   p39sing(p39, "ほー、ほけきょ。けきょ。", "[G420R60G60[C60]C60R[C60]C60] R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C] R");
   // test for unexpected character
