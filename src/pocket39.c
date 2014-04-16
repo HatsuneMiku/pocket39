@@ -144,7 +144,7 @@ Pocket39 *p39open()
   r = midiOutOpen(&p39->hMO, p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
   if(r){
     r = midiOutOpen(&p39->hMO, --p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
-    p39->bend = 4095;
+    p39->bend = 4095; // *** wrong way ? should better to send RPN ?
   }
   assert(!r);
   r = p39reset(p39);
