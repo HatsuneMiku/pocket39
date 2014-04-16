@@ -25,6 +25,10 @@ char *nsx39 = "NSX-39";
 
 typedef struct _Pocket39_tag {
   HMIDIOUT hMO;
+  BYTE dev_id; // 1
+  BYTE ch; // 0
+  BYTE stat; // 0
+  BYTE dummy; // 0
   BYTE tone; // F (F#4)
   char sft; // 1 (F#4)
   char oct; // 4 (F#4)
@@ -93,6 +97,10 @@ UINT p39prepare(Pocket39 *p39)
 {
   int i, j, cnt = 0;
   p39->hMO = 0;
+  p39->dev_id = 1;
+  p39->ch = 0;
+  p39->stat = 0;
+  p39->dummy = 0;
   p39->tone = 'F';
   p39->sft = 1;
   p39->oct = 4;
@@ -112,7 +120,7 @@ UINT p39prepare(Pocket39 *p39)
 Pocket39 *p39open()
 {
   UINT r;
-  int i, id = 1;
+  int i;
   Pocket39 *p39 = (Pocket39 *)malloc(sizeof(Pocket39));
   assert(p39);
   r = p39prepare(p39);
@@ -123,9 +131,10 @@ Pocket39 *p39open()
     r = midiOutGetDevCaps(i, &moc, sizeof(moc));
     if(!r) fprintf(stdout, " %d: %s\n", i, moc.szPname);
   }
-  r = midiOutOpen(&p39->hMO, id, (ULONG)NULL, 0, CALLBACK_NULL);
+  p39->dev_id = 1;
+  r = midiOutOpen(&p39->hMO, p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
   if(r){
-    r = midiOutOpen(&p39->hMO, --id, (ULONG)NULL, 0, CALLBACK_NULL);
+    r = midiOutOpen(&p39->hMO, --p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
     p39->bend = 4095;
   }
   assert(!r);
@@ -225,9 +234,13 @@ UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 
 UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 {
-  char *p = lyrics;
+  BYTE voice_buf[4096], note_buf[4096];
+  BYTE *v = voice_buf, *n = note_buf;
+  char *p = lyrics, *q = notes;
+
   fprintf(stdout, "%s / %s\n", lyrics, notes);
   do{
+    *v = 0xFF;
     BYTE idx = p39pron_scan(p);
     if(idx == 0xFF){
       ++p;
@@ -235,17 +248,47 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     }
     p += strlen(pron[idx]);
 //    fprintf(stdout, "%08x %s\n", idx, pron[idx]);
-    if(idx & 0x80){
-      idx = pron_ext[idx & 0x7F];
-      if(idx == 0xFF) continue;
-    }
-    if(idx & 0x80){
-      p39note(p39, 0, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
-    }else{
-      p39voice(p39, 0, idx);
-      p39note(p39, 0, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
-    }
+    if(idx & 0x80) if((idx = pron_ext[idx & 0x7F]) == 0xFF) continue;
+    *v++ = idx;
   }while(*p);
+  *v = 0xFF;
+
+  if(notes[0] == '\0'){
+    BYTE ch = p39->ch;
+    for(v = voice_buf; *v != 0xFF; ){
+      BYTE idx = *v++;
+      if(idx & 0x80){
+        p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+      }else{
+        p39voice(p39, 0, idx);
+        p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
+      }
+    }
+    return 0;
+  }
+
+  do{
+    *n = 0xFF;
+    BYTE d = *q++;
+    if((d < 'A' || d > 'G') && d != 'R') continue;
+    *n++ = d;
+  }while(*q);
+  *n = 0xFF;
+
+  for(v = voice_buf, n = note_buf; *n != 0xFF; ++n){
+    BYTE ch = p39->ch;
+    BYTE idx = *v;
+    if(idx == 0xFF) ch = 3;
+    else ++v;
+    if(*n == 'R'){
+      p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
+    }else{
+      p39->tone = *n;
+      p39voice(p39, 0, idx);
+      p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
+    }
+  }
+
   return 0;
 }
 
@@ -261,8 +304,8 @@ int main(int ac, char **av)
 
 #if 1
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "GECEG[C240]G GAGCE360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "", "GECEG[D240]G GAGCD360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[D240]G GAGCD360");
   p39sing(p39, "てってってー、みく。", "G60R60G60R60G120R[C60C60]R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
 #endif
