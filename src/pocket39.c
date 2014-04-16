@@ -131,23 +131,28 @@ UINT p39reset(Pocket39 *p39)
 Pocket39 *p39open()
 {
   UINT r;
-  int i;
+  int i, n = -1;
   Pocket39 *p39 = (Pocket39 *)malloc(sizeof(Pocket39));
   assert(p39);
   r = p39prepare(p39);
   assert(!r);
   r = midiOutGetNumDevs();
+  fprintf(stdout, "scanning (%d) MIDI Devices\n", r);
   for(i = r; --i >= 0; ){
     MIDIOUTCAPS moc;
     r = midiOutGetDevCaps(i, &moc, sizeof(moc));
-    if(!r) fprintf(stdout, " %d: %s\n", i, moc.szPname);
+    if(!r){
+      fprintf(stdout, " %d: %s\n", i, moc.szPname);
+      if(!strncmp(moc.szPname, nsx39, strlen(nsx39))) n = i;
+    }
   }
-  p39->dev_id = 1;
-  r = midiOutOpen(&p39->hMO, p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
-  if(r){
-    r = midiOutOpen(&p39->hMO, --p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
+  if(n < 0){
+    n = 0;
+    fprintf(stdout, "Device %s is not found, choose Device %d\n", nsx39, n);
     p39->bend = 4095; // *** wrong way ? must send RPN ?
   }
+  p39->dev_id = n;
+  r = midiOutOpen(&p39->hMO, p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
   assert(!r);
   r = p39reset(p39);
   assert(!r);
