@@ -17,8 +17,10 @@
 
 #define P39NOTEOFF(ch, tone, vel) (((vel) << 16) | ((tone) << 8) | (ch) | 0x80)
 #define P39NOTEON(ch, tone, vel) (((vel) << 16) | ((tone) << 8) | (ch) | 0x90)
+#define P39PKPRESS(ch, tone, vel) (((vel) << 16) | ((tone) << 8) | (ch) | 0xA0)
 #define P39CC(ch, ctrl, val) (((val) << 16) | ((ctrl) << 8) | (ch) | 0xB0)
 #define P39PROG(ch, pg) (((pg) << 8) | (ch) | 0xC0)
+#define P39CHPRESS(ch, vel) (((vel) << 8) | (ch) | 0xD0)
 #define P39PITCH(ch, lsb, msb) (((msb) << 16) | ((lsb) << 8) | (ch) | 0xE0)
 
 char *nsx39 = "NSX-39";
@@ -144,7 +146,7 @@ Pocket39 *p39open()
   r = midiOutOpen(&p39->hMO, p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
   if(r){
     r = midiOutOpen(&p39->hMO, --p39->dev_id, (ULONG)NULL, 0, CALLBACK_NULL);
-    p39->bend = 4095; // *** wrong way ? should better to send RPN ?
+    p39->bend = 4095; // *** wrong way ? must send RPN ?
   }
   assert(!r);
   r = p39reset(p39);
@@ -188,14 +190,17 @@ UINT p39wait(Pocket39 *p39, int len)
 UINT p39note(Pocket39 *p39,
   BYTE ch, BYTE flg, BYTE tone, char sft, char oct, BYTE vel, int len)
 {
-  UINT r;
+  UINT r, f;
   BYTE d;
   char o = (dtone[dtone_len - 1] - dtone[0]) * (oct - 4);
   BYTE t = tone - 'C' + ((tone == 'A' || tone == 'B') ? 7 : 0);
   assert(tone >= 'A' && tone <= 'G');
   d = dtone[t] + sft + o + p39->pitch;
-  r = midiOutShortMsg(p39->hMO,
-    flg ? P39NOTEON(ch, d, vel) : P39NOTEOFF(ch, d, vel));
+  if(!flg) f = P39NOTEOFF(ch, d, vel);
+  else if(flg == 1) f = P39NOTEON(ch, d, vel);
+  else if(flg == 2) f = P39PKPRESS(ch, d, vel);
+  else f = P39PKPRESS(ch, d, vel);
+  r = midiOutShortMsg(p39->hMO, f);
   assert(!r);
   if(len) p39wait(p39, len);
   return 0;
@@ -348,7 +353,9 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
 #endif
     if(*n & 0x08){ // quiet
-      if(k == 2 || k == 3) p39shift(p39, 0, p39->sft, p39->len);
+      if(k == 2 || k == 3) p39shift(p39, ch, p39->sft, p39->len);
+      if(k == 6)
+        p39note(p39, ch, 2, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
       continue;
     }
     if(idx == 0xFF) ch = 3;
