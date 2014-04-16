@@ -251,9 +251,10 @@ int main(int ac, char **av)
   p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
 
   p39sing(p39, "きしゃのきしゃがきしゃできしゃした", "");
+  p39sing(p39, "", "GECEGA240G GAGCD360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEGA240G GAGCD360");
   p39sing(p39, "てってってーみく", "G60R60F60R60E120D60C60");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEGA240G GAGCD360");
 
 #if 0
   p39voice(p39, 0, 0x00);
