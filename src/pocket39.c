@@ -347,13 +347,14 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
 #endif
     if(*n & 0x08){ // quiet
-      // pitch bend
+      if(k == 2 || k == 3) p39shift(p39, 0, p39->sft, p39->len);
       continue;
     }
     if(idx == 0xFF) ch = 3;
     if(k == 7){ // 'R'
       if(idx == 0x80) ++v;
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
+      if(1) p39bend(p39, 0, 0, 0); // **** not sure
     }else{
       if(idx != 0xFF) ++v;
       p39->tone = 'A' + k;
