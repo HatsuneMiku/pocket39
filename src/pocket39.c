@@ -193,7 +193,7 @@ UINT p39note(Pocket39 *p39,
   char o = (dtone[dtone_len - 1] - dtone[0]) * (oct - 4);
   BYTE t = tone - 'C' + ((tone == 'A' || tone == 'B') ? 7 : 0);
   assert(tone >= 'A' && tone <= 'G');
-  d = dtone[t] + sft + o;
+  d = dtone[t] + sft + o + p39->pitch;
   r = midiOutShortMsg(p39->hMO,
     flg ? P39NOTEON(ch, d, vel) : P39NOTEOFF(ch, d, vel));
   assert(!r);
@@ -236,6 +236,8 @@ UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 
 UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 {
+  int pitch = p39->pitch;
+  char sft = p39->sft;
   char oct = p39->oct;
   char *p = lyrics, *q = notes;
   BYTE voice_buf[4096]; // 0x00 - 0x7F, 0x80, 0xFF
@@ -244,16 +246,15 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   UINT *n = note_buf;
 /*
   about 'note_buf[]':
-    bits 31-18: length
-    bits 17-11: velocity
-    bits    10: pitch shift flag (0: no, 1: yes)
-    bits     9: pitch shift value (0: # +1, 1: = -1)
-    bits     8: not use
+    bits 31-22: length 0-1023
+    bits 21-15: velocity 0-127
+    bits 14-10: pitch bend (center 16)
+    bits  9- 8: pitch shift (center 2)
     bits  7- 4: octave 0-15
     bits  3- 0: fkkk
         kkk:         0 1 2 3 4 5 6 7
       f = 0: (sound) A B C D E F G R (takes voice at the same time)
-      f = 1: (quiet) + - # = v n [ ] (v: velocity, n: neglect)
+      f = 1: (quiet) + - # = [ ] v n (v: velocity, n: neglect)
     '#' means sharp
     '=' means flat
 */
@@ -290,22 +291,31 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   do{
     BYTE d = *q++;
     UINT u = 0;
-    if(d == ' '){                   u |= 13;
-    }else if(d >= 'A' && d <= 'G'){ u |= d - 'A'; // 0-6
-    }else if(d == 'R'){             u |= 7;
-    }else if(d == '+' || d == '-'){ u |= (d == '+') ? 8 : 9;
-    }else if(d == '#' || d == '='){ u |= (d == '#') ? 10 : 11;
-    }else if(d == 'v'){             u |= 12;
-    }else if(d == 'n'){             u |= 13;
-    }else if(d == '['){             u |= 14; ++oct;
-    }else if(d == ']'){             u |= 15; --oct;
+    if(d == ' '){ u |= 15;
+    }else if(d >= 'A' && d <= 'G'){
+      u |= d - 'A'; // 0-6
+      if(*q == '#' || *q == '='){
+        sft = (*q == '#') ? 1 : -1;
+        ++q;
+      }else sft = 0;
+    }else if(d == 'R'){ u |= 7;
+    }else if(d == '+'){ u |= 8; ++pitch;
+    }else if(d == '-'){ u |= 9; --pitch;
+    }else if(d == '#'){ u |= 10; ++sft;
+    }else if(d == '='){ u |= 11; --sft;
+    }else if(d == '['){ u |= 12; ++oct;
+    }else if(d == ']'){ u |= 13; --oct;
+    }else if(d == 'v'){ u |= 14;
+    }else if(d == 'n'){ u |= 15;
     }else{
-      u |= 13;
+      u |= 15;
       fprintf(stderr, "unexpected character [%c]\n", d);
     }
-    if(u & 0x0F != 13){
+    if(u & 0x0F != 15){
       // q = process_number();
     }
+    u |= (pitch + 16) << 10;
+    u |= (sft + 2) << 8;
     u |= oct << 4;
     *n++ = u;
   }while(*q);
@@ -316,13 +326,16 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     BYTE k = *n & 0x07;
     BYTE idx = *v;
     char *s = idx != 0xFF ? (idx != 0x80 ? pron[idx] : "0x80") : "0xFF";
-    fprintf(stdout, "%08x %d %s\n", *n, p39->oct, s);
+    fprintf(stdout, "%08x %d %2d %3d %s\n",
+      *n, p39->oct, p39->sft, p39->pitch, s);
     if(*n & 0x08){ // quiet
 
       continue;
     }
     if(idx == 0xFF) ch = 3;
     else ++v;
+    p39->pitch = ((*n >> 10) & 0x1F) - 16;
+    p39->sft = ((*n >> 8) & 0x03) - 2;
     p39->oct = (*n >> 4) & 0x0F;
     if(k == 7){ // 'R'
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
@@ -347,14 +360,14 @@ int main(int ac, char **av)
 
 #if 1
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "==GECEG[C240]G GAGCE360");
+  p39sing(p39, "", "--GECEG[C240]G GAGCE360");
   p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
   p39sing(p39, "てってってー、", "G60R60G60R60G120R");
   p39sing(p39, "てってっててー。", "G60R60G60R60G50R10G120R");
   p39sing(p39, "みく。", "[G60C60]R");
-  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C]");
+  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C] R");
   // test for unexpected character
-  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
+//  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
 #endif
 
 #if 0
