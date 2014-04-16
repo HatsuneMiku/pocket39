@@ -190,6 +190,12 @@ UINT p39bend(Pocket39 *p39, BYTE ch, int val, int len)
   return 0;
 }
 
+UINT p39shift(Pocket39 *p39, BYTE ch, int sft, int len)
+{
+  p39bend(p39, ch, sft * p39->bend, len);
+  return 0;
+}
+
 UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 {
   UINT r;
@@ -232,7 +238,7 @@ int main(int ac, char **av)
   p39note(p39, 0, 1, 'E', 0, 4, 100, 240);
   p39voice(p39, 0, 0x68);
   p39note(p39, 0, 1, 'C', 0, 4, 100, 120);
-  p39bend(p39, 0, 2 * p39->bend, 120);
+  p39shift(p39, 0, 2, 120);
   p39note(p39, 0, 0, 'C', 0, 4, 100, 0);
   p39bend(p39, 0, 0, 0);
   p39voice(p39, 0, 0x43);
@@ -247,7 +253,7 @@ int main(int ac, char **av)
   p39note(p39, 0, 1, 'G', 0, 4, 100, 240);
   p39voice(p39, 0, 0x2E);
   p39note(p39, 0, 1, 'F', 0, 4, 100, 120);
-  p39bend(p39, 0, -1 * p39->bend, 120);
+  p39shift(p39, 0, -1, 120);
   p39note(p39, 0, 0, 'F', 0, 4, 100, 0);
   p39bend(p39, 0, 0, 0);
   p39voice(p39, 0, 0x20);
