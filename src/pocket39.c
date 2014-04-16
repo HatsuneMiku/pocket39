@@ -234,14 +234,31 @@ UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 
 UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 {
-  BYTE voice_buf[4096], note_buf[4096];
-  BYTE *v = voice_buf, *n = note_buf;
   char *p = lyrics, *q = notes;
+  BYTE voice_buf[4096]; // 0x00 - 0x7F, 0x80, 0xFF
+  BYTE *v = voice_buf;
+  UINT note_buf[4096]; // see below
+  UINT *n = note_buf;
+/*
+  about 'note_buf[]':
+    bits 31-18: length
+    bits 17-11: velocity
+    bits    10: pitch shift flag (0: no, 1: yes)
+    bits     9: pitch shift value (0: # +1, 1: = -1)
+    bits  8- 5: octave 0-15
+    bits     4: not use
+    bits  3- 0: fkkk
+        kkk:         0 1 2 3 4 5 6 7
+      f = 0: (sound) A B C D E F G R (takes voice at the same time)
+      f = 1: (quiet) + - # = v n [ ] (v: velocity, n: neglect)
+    '#' means sharp
+    '=' means flat
+*/
 
   fprintf(stdout, "%s / %s\n", lyrics, notes);
   do{
-    *v = 0xFF;
     BYTE idx = p39pron_scan(p);
+    *v = 0xFF;
     if(idx == 0xFF){
       ++p;
       continue;
@@ -268,22 +285,47 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   }
 
   do{
-    *n = 0xFF;
     BYTE d = *q++;
-    if((d < 'A' || d > 'G') && d != 'R') continue;
-    *n++ = d;
+    UINT u = 0;
+    if(d >= 'A' && d <= 'G'){
+      u |= d - 'A'; // 0-6
+    }else if(d == 'R'){
+      u |= 7;
+    }else if(d == '+' || d == '-'){
+      u |= (d == '+') ? 8 : 9;
+    }else if(d == '#' || d == '='){
+      u |= (d == '#') ? 10 : 11;
+    }else if(d == 'v'){
+      u |= 12;
+    }else if(d == 'n'){
+      u |= 13;
+    }else if(d == '[' || d == ']'){
+      u |= (d == '[') ? 14 : 15;
+    }else{
+      u |= 13;
+    }
+    if(u & 0x0F != 13){
+      // q = process_number();
+    }
+    *n++ = u;
   }while(*q);
   *n = 0xFF;
 
   for(v = voice_buf, n = note_buf; *n != 0xFF; ++n){
     BYTE ch = p39->ch;
+    BYTE k = *n & 0x07;
     BYTE idx = *v;
+    fprintf(stdout, "%08x %s\n", *n, idx == 0xFF ? "0xFF" : pron[idx]);
+    if(*n & 0x08){ // quiet
+
+      continue;
+    }
     if(idx == 0xFF) ch = 3;
     else ++v;
-    if(*n == 'R'){
+    if(k == 7){ // 'R'
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, 0);
     }else{
-      p39->tone = *n;
+      p39->tone = 'A' + k;
       p39voice(p39, 0, idx);
       p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
     }
@@ -304,8 +346,8 @@ int main(int ac, char **av)
 
 #if 1
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "GECEG[D240]G GAGCD360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[D240]G GAGCD360");
+  p39sing(p39, "", "GECEG[C240]G GAGCE360");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEG[C240]G GAGCE360");
   p39sing(p39, "てってってー、みく。", "G60R60G60R60G120R[C60C60]R");
   p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
 #endif
