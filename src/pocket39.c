@@ -77,14 +77,14 @@ char pron_ext[] = {
 };
 size_t pron_ext_len = sizeof(pron_ext) / sizeof(pron_ext[0]);
 
-UINT pron_match[sizeof(pron) / sizeof(pron[0])] = {0};
+BYTE pron_match[sizeof(pron) / sizeof(pron[0])] = {0};
 
 BYTE p39pron_scan(char *lyric)
 {
   int i;
   for(i = 0; i < pron_len; ++i){
-    int idx = pron_match[i];
-    if(!strncmp(lyric, pron[idx], strlen(pron[idx]))) return (BYTE)idx;
+    BYTE idx = pron_match[i];
+    if(!strncmp(lyric, pron[idx], strlen(pron[idx]))) return idx;
   }
   return 0xFF;
 }
@@ -103,7 +103,7 @@ UINT p39prepare(Pocket39 *p39)
   p39->tempo = 240;
   for(j = sizeof(pron[0]) / sizeof(pron[0][0]); --j > 0; )
     for(i = 0; i < pron_len; ++i)
-      if(strlen(pron[i]) == j) pron_match[cnt++] = i;
+      if(strlen(pron[i]) == j) pron_match[cnt++] = (BYTE)i;
   assert(cnt == pron_len);
 //  for(i = 0; i < pron_len; ++i) fprintf(stdout, " %02x", pron_match[i]);
   return 0;
