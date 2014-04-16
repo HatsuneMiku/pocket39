@@ -246,15 +246,15 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   UINT *n = note_buf;
 /*
   about 'note_buf[]':
-    bits 31-22: length 0-1023
-    bits 21-15: velocity 0-127
-    bits 14-10: pitch bend (center 16)
-    bits  9- 8: pitch shift (center 2)
-    bits  7- 4: octave 0-15
+    bits 31-21: length 0-2047
+    bits 20-14: velocity 0-127
+    bits 13- 8: pitch shift (center 32)
+    bits     7: not use
+    bits  6- 4: octave 0-7
     bits  3- 0: fkkk
         kkk:         0 1 2 3 4 5 6 7
       f = 0: (sound) A B C D E F G R (takes voice at the same time)
-      f = 1: (quiet) + - # = [ ] v n (v: velocity, n: neglect)
+      f = 1: (quiet) + - # = [ ] v p (v: velocity, p: pitch bend)
     '#' means sharp
     '=' means flat
 */
@@ -291,7 +291,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   do{
     BYTE d = *q++;
     UINT u = 0;
-    if(d == ' '){ u |= 15;
+    if(d == ' '){ continue;
     }else if(d >= 'A' && d <= 'G'){
       u |= d - 'A'; // 0-6
       if(*q == '#' || *q == '='){
@@ -306,16 +306,13 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     }else if(d == '['){ u |= 12; ++oct;
     }else if(d == ']'){ u |= 13; --oct;
     }else if(d == 'v'){ u |= 14;
-    }else if(d == 'n'){ u |= 15;
+    }else if(d == 'p'){ u |= 15;
     }else{
-      u |= 15;
       fprintf(stderr, "unexpected character [%c]\n", d);
+      continue;
     }
-    if(u & 0x0F != 15){
-      // q = process_number();
-    }
-    u |= (pitch + 16) << 10;
-    u |= (sft + 2) << 8;
+    // q = process_number();
+    u |= (sft + 32) << 8;
     u |= oct << 4;
     *n++ = u;
   }while(*q);
@@ -326,20 +323,23 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     BYTE k = *n & 0x07;
     BYTE idx = *v;
     char *s = idx != 0xFF ? (idx != 0x80 ? pron[idx] : "0x80") : "0xFF";
+    p39->sft = ((*n >> 8) & 0x3F) - 32;
+    p39->oct = (*n >> 4) & 0x07;
+#if 1
     fprintf(stdout, "%08x %d %2d %3d %s\n",
-      *n, p39->oct, p39->sft, p39->pitch, s);
+      *n, p39->oct, p39->sft, p39->pitch,
+      (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
+#endif
     if(*n & 0x08){ // quiet
 
       continue;
     }
     if(idx == 0xFF) ch = 3;
-    else ++v;
-    p39->pitch = ((*n >> 10) & 0x1F) - 16;
-    p39->sft = ((*n >> 8) & 0x03) - 2;
-    p39->oct = (*n >> 4) & 0x0F;
     if(k == 7){ // 'R'
+      if(idx == 0x80) ++v;
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
     }else{
+      if(idx != 0xFF) ++v;
       p39->tone = 'A' + k;
       p39voice(p39, 0, idx);
       p39note(p39, ch, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
