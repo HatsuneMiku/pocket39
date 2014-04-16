@@ -9,7 +9,7 @@ Pocket Miku
 なにこれ？
 ----------
 
-ポケット・ミクにひらがなで書いたテキストを読んで(歌って)もらうソフトです。
+ポケット・ミク ( [NSX-39](http://otonanokagaku.net/nsx39/) ) にひらがなで書いたテキストを読んで(歌って)もらうソフトです。
 
 コンパイルには [dmc](http://www.digitalmars.com/d/download.html) が必要です。
 
@@ -54,4 +54,9 @@ Pocket Miku
 - 音の長さを「ー」の数で指定するとか
 - あとで com サーバーにしてみる
 - たぶんバグいっぱい
+
+びこうらん
+----------
+
+- pocket39.py はテスト用です。参照 ( [OpenMIDI project](http://openmidiproject.sourceforge.jp/) )
 - BSD license
