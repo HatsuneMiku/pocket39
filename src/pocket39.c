@@ -234,6 +234,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       continue;
     }
     p += strlen(pron[idx]);
+//    fprintf(stdout, "%08x %s\n", idx, pron[idx]);
     if(idx & 0x80) if((idx = pron_ext[idx & 0x7F]) == 0xFF) continue;
     p39voice(p39, 0, idx);
     p39note(p39, 0, 1, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
@@ -249,7 +250,10 @@ int main(int ac, char **av)
   p39programs(p39, default_banks, default_banks_len);
   p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
 
-  p39sing(p39, "てってってーみく", "GFEDC");
+  p39sing(p39, "きしゃのきしゃがきしゃできしゃした", "");
+  p39sing(p39, "てってってーみく", "G60R60F60R60E120D60C60");
+  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
+  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま", "GECEGA240G GAGCD360");
 
 #if 0
   p39voice(p39, 0, 0x00);
