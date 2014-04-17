@@ -60,10 +60,15 @@
 ^Z
 &gt; echo みくだよ | pocket39
 &gt; pocket39
-おんていもつけられます。 / CDEFGAB[CDC]B
+おんていもつけられます。 / CEG[CEG[C]]GC]G[C
 うたうこともできます。
 ^Z
 &gt; pocket39 &lt; fuji3.p39
+</code></pre>
+
+<p>※こういうことはしないでください。</p>
+
+<pre><code>&gt; pocket39 &lt; README.md
 </code></pre>
 
 <h2>
@@ -71,16 +76,16 @@
 
 <ul>
 <li>マニュアル作る</li>
-<li>パラメータの最大値チェック</li>
-<li>初期化時の MIDI Message (ボリューム等)</li>
+<li>パラメータの最大値最小値チェック</li>
+<li>初期化時の MIDI Message (テンポ・ボリューム等)</li>
 <li>開始前の無音期間指定</li>
 <li>RPN とか CC 送る？ (ミクの声は pitch bend sensitivity のデフォルト値が違う)</li>
 <li>ベロシティも各音または任意の位置で指定出来るようにしたい</li>
 <li>pitch bend の時の前の音との繋がりを考慮して envelope 出力する</li>
 <li>Sleep() でタイミングが適当なので FIFO 経由して timer thread で出力する予定</li>
 <li>note off は毎回ちゃんと送るべき？</li>
-<li>NSX-39 の検索が適当で Device 1 優先にしてるだけなので治す</li>
 <li>SMF ファイルの出力 あるいは .SMF &lt;-&gt; .p39 コンバータ造る</li>
+<li>.p39 ファイルにテンポ指定とかその他(発声以外の楽器指定とかコーラスとか)</li>
 <li>声以外の楽器にも対応したい (ここまでするなら素直に MIDI コントローラで・・・)</li>
 <li>オフセット指定サポートで曲全体のキーを変えられるような・・・</li>
 <li>歌詞と楽譜を一音ずつ混在する記述「あC240いE120うG60」をサポート予定</li>
