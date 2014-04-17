@@ -29,10 +29,14 @@ Pocket Miku
     ^Z
     > echo みくだよ | pocket39
     > pocket39
-    おんていもつけられます。 / CDEFGAB[CDC]B
+    おんていもつけられます。 / CEG[CEG[C]]GC]G[C
     うたうこともできます。
     ^Z
     > pocket39 < fuji3.p39
+
+※こういうことはしないでください。
+
+    > pocket39 < README.md
 
 もくひょう
 ----------

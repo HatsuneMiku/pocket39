@@ -381,6 +381,8 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 
 int main(int ac, char **av)
 {
+  char buf[4096];
+
   Pocket39 *p39 = p39open();
   p39programs(p39, default_banks, default_banks_len);
 
@@ -388,7 +390,7 @@ int main(int ac, char **av)
   p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
 #endif
 
-#if 1
+#if 0
   p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
   p39sing(p39, "", "FD]B=[DFB=240F FGF]B=[D360");
   p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
@@ -484,7 +486,7 @@ int main(int ac, char **av)
   p39note(p39, 0, 1, 'C', 0, 4, 100, 840);
 #endif
 
-#if 1
+#if 0
   p39sing(p39, "あたまを", "G360GA240G240");
   p39sing(p39, "くもの", "E240C120#0#E360R");
   p39sing(p39, "うえにだし", "D360GG240F120=D840R");
@@ -497,6 +499,28 @@ int main(int ac, char **av)
   p39sing(p39, "にっぽん", "E360RA240G240");
   p39sing(p39, "いちのやま", "F240E240D360CC840R");
 #endif
+
+  while(fgets(buf, sizeof(buf), stdin)){
+    size_t end;
+    char *p;
+//    fprintf(stdout, buf);
+    if(buf[0] == 0x0D || buf[0] == 0x0A) continue;
+    if(buf[0] == '#') continue;
+    end = strlen(buf) - 1;
+    if(buf[end] == 0x0D || buf[end] == 0x0A) buf[end] = '\0';
+    end = strlen(buf) - 1;
+    if(buf[end] == 0x0D || buf[end] == 0x0A) buf[end] = '\0';
+    p = strstr(buf, "/");
+    if(!p){
+      int i;
+      for(i = 0; i < strlen(buf); ++i) if(buf[i] & 0x80) break;
+      if(i != strlen(buf)) p39sing(p39, buf, "");
+      else p39sing(p39, "", buf);
+    }else{
+      *p++ = '\0';
+      p39sing(p39, buf, p);
+    }
+  }
 
   p39close(p39);
   return 0;
