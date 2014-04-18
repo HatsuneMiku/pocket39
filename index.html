@@ -40,7 +40,7 @@
 </ul><h2>
 <a name="%E3%81%AA%E3%81%AB%E3%81%93%E3%82%8C--aeff480r" class="anchor" href="#%E3%81%AA%E3%81%AB%E3%81%93%E3%82%8C--aeff480r"><span class="octicon octicon-link"></span></a>なにこれ？ / AEFF480R</h2>
 
-<p>ポケット・ミク ( <a href="http://otonanokagaku.net/nsx39/">NSX-39</a> ) さんにひらがなで書いたテキストを読んでもらうソフトです。</p>
+<p>ポケット・ミク ( <a href="http://otonanokagaku.net/nsx39/">NSX-39</a> ) さんにひらがなで書いたテキストを読んで(喋って)もらうソフトです。</p>
 
 <p>楽譜を一行ごとに並列に書き込んでおくことで、テキストファイルの歌詞を歌ってもらうことも出来ます。</p>
 
@@ -91,10 +91,10 @@
 ぽけみくは、おおえすのひょうじゅんにゅうりょくを、よみあげます。
 つまりこういうことです。
 ^Z
-&gt; echo みくだよ | pocket39
+&gt; echo みくだよ / CEG[C480}R | pocket39
 &gt; pocket39
-おんていもつけられます。 / CEG[CEG[C]]GC]G[C
-うたうこともできます。
+おんていもつけられます。 / CEG[CEG[C]]GC]G[C480R
+うたうこともできます。 / CFAF[CF]B=FE=]B=480[R
 ^Z
 &gt; pocket39 &lt; fuji3.p39
 </code></pre>
@@ -114,6 +114,7 @@
 <li>開始前の無音期間指定</li>
 <li>RPN とか CC 送る？ (ミクの声は pitch bend sensitivity のデフォルト値が違う)</li>
 <li>ベロシティも各音または任意の位置で指定出来るようにしたい</li>
+<li>ビブラートとかポルタメントとかかけたい モジュレーションでOK?</li>
 <li>pitch bend の時の前の音との繋がりを考慮して envelope 出力する</li>
 <li>Sleep() でタイミングが適当なので FIFO 経由して timer thread で出力する予定</li>
 <li>note off は毎回ちゃんと送るべき？</li>
