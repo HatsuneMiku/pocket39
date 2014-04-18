@@ -30,7 +30,7 @@ typedef struct _Pocket39_tag {
   BYTE dev_id; // 1
   BYTE ch; // 0
   BYTE stat; // 0
-  BYTE dummy; // 0
+  BYTE mod; // 0
   BYTE tone; // F (F#4)
   char sft; // 1 (F#4)
   char oct; // 4 (F#4)
@@ -102,7 +102,7 @@ UINT p39prepare(Pocket39 *p39)
   p39->dev_id = 1;
   p39->ch = 0;
   p39->stat = 0;
-  p39->dummy = 0;
+  p39->mod = 0;
   p39->tone = 'F';
   p39->sft = 1;
   p39->oct = 4;
@@ -228,6 +228,11 @@ UINT p39shift(Pocket39 *p39, BYTE ch, int sft, int len)
   return 0;
 }
 
+UINT p39modulation(Pocket39 *p39, BYTE ch, BYTE mod, int len)
+{
+  return 0;
+}
+
 UINT p39voice(Pocket39 *p39, BYTE ch, BYTE voice)
 {
   UINT r;
@@ -273,7 +278,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     bits  3- 0: fkkk
         kkk:         0 1 2 3 4 5 6 7
       f = 0: (sound) A B C D E F G R (takes voice at the same time)
-      f = 1: (quiet) + - # = [ ] v p (v: velocity, p: pitch bend)
+      f = 1: (quiet) + - # = [ ] v m (v: velocity, m: modulation)
     '#' means sharp
     '=' means flat
 */
@@ -322,10 +327,10 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     }else if(d == '-'){ u |= 9; --pitch;
     }else if(d == '#'){ u |= 10; ++sft;
     }else if(d == '='){ u |= 11; --sft;
-    }else if(d == '['){ u |= 12; ++oct;
-    }else if(d == ']'){ u |= 13; --oct;
+    }else if(d == '[' || d == '<'){ u |= 12; ++oct;
+    }else if(d == ']' || d == '>'){ u |= 13; --oct;
     }else if(d == 'v'){ u |= 14;
-    }else if(d == 'p'){ u |= 15;
+    }else if(d == 'm'){ u |= 15;
     }else{
       fprintf(stderr, "unexpected character [%c]\n", d);
       continue;
@@ -334,11 +339,11 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
 //    if(num) fprintf(stdout, "%d\n", num);
     u |= (sft + 32) << 8;
     u |= oct << 4;
-    // velocity or pitch bend
-    u |= ((d != 'v' && d != 'p') ? 100 : \
-      ((num >= 0) ? num : (d == 'p' ? 64 : 100))) << 14;
+    // velocity or modulation
+    u |= ((d != 'v' && d != 'm') ? 100 : \
+      ((num >= 0) ? num : (d == 'm' ? 0 : 100))) << 14;
     // length
-    u |= ((d != 'v' && d != 'p') ? ((num >= 0) ? num : 120) : 120) << 21;
+    u |= ((d != 'v' && d != 'm') ? ((num >= 0) ? num : 120) : 120) << 21;
     *n++ = u;
   }while(*q);
   *n = 0xFF;
@@ -353,8 +358,8 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     p39->vel = (*n >> 14) & 0x7F;
     p39->len = (*n >> 21) & 0x03FF;
 #if 1
-    fprintf(stdout, "%08x %6d v(%3d) o(%d) s(%2d) p(%3d) %s\n",
-      *n, p39->len, p39->vel, p39->oct, p39->sft, p39->pitch,
+    fprintf(stdout, "%08x %6d v(%3d) o(%d) s(%2d) p(%3d) m(%3d) %s\n",
+      *n, p39->len, p39->vel, p39->oct, p39->sft, p39->pitch, p39->mod,
       (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
 #endif
     if(*n & 0x08){ // quiet

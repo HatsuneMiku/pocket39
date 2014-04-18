@@ -9,7 +9,7 @@ Pocket Miku
 なにこれ？ / AEFF480R
 ---------------------
 
-ポケット・ミク ( [NSX-39](http://otonanokagaku.net/nsx39/) ) さんにひらがなで書いたテキストを読んでもらうソフトです。
+ポケット・ミク ( [NSX-39](http://otonanokagaku.net/nsx39/) ) さんにひらがなで書いたテキストを読んで(喋って)もらうソフトです。
 
 楽譜を一行ごとに並列に書き込んでおくことで、テキストファイルの歌詞を歌ってもらうことも出来ます。
 
@@ -59,10 +59,10 @@ Pocket Miku
     ぽけみくは、おおえすのひょうじゅんにゅうりょくを、よみあげます。
     つまりこういうことです。
     ^Z
-    > echo みくだよ | pocket39
+    > echo みくだよ / CEG[C480}R | pocket39
     > pocket39
-    おんていもつけられます。 / CEG[CEG[C]]GC]G[C
-    うたうこともできます。
+    おんていもつけられます。 / CEG[CEG[C]]GC]G[C480R
+    うたうこともできます。 / CFAF[CF]B=FE=]B=480[R
     ^Z
     > pocket39 < fuji3.p39
 
@@ -79,6 +79,7 @@ Pocket Miku
 - 開始前の無音期間指定
 - RPN とか CC 送る？ (ミクの声は pitch bend sensitivity のデフォルト値が違う)
 - ベロシティも各音または任意の位置で指定出来るようにしたい
+- ビブラートとかポルタメントとかかけたい モジュレーションでOK?
 - pitch bend の時の前の音との繋がりを考慮して envelope 出力する
 - Sleep() でタイミングが適当なので FIFO 経由して timer thread で出力する予定
 - note off は毎回ちゃんと送るべき？
