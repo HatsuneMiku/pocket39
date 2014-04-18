@@ -399,6 +399,14 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       if(*q == '#' || *q == '='){
         sft = (*q == '#') ? 1 : -1;
         ++q;
+        if(*q == '#' || *q == '='){
+          sft += (*q == '#') ? 1 : -1;
+          ++q;
+          if(*q == '#' || *q == '='){
+            sft += (*q == '#') ? 1 : -1;
+            ++q;
+          }
+        }
       }else sft = 0;
     }else if(d == 'R'){ u |= 7;
     }else if(d == '+'){ u |= 8; ++sft; // ++pitch;
@@ -455,6 +463,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
       p39note(p39, ch, 0, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
     }else{
       if(idx != 0xFF) ++v;
+      else if(lyrics[0] != '\0') break; // voice_buf[0] != 0xFF
       if(1) p39bend(p39, 0, 0, 0); // *** not sure
       p39->tone = 'A' + k;
       p39voice(p39, 0, idx);
@@ -599,8 +608,9 @@ int main(int ac, char **av)
     p = strstr(buf, "/");
     if(!p){
       int i;
+      char *bkg = "DFFFGFFFGB=B=B#B=GFRB=B=GFGGFDF60R60D60D60F60R60D60D60CCC==RRREGGGAGGGAB#B#B###B#AGRB#B#AGAAGEG60R60E60E60G60R60E60E60DDCRRR";
       for(i = 0; i < strlen(buf); ++i) if(buf[i] & 0x80) break;
-      if(i != strlen(buf)) p39sing(p39, buf, "");
+      if(i != strlen(buf)) p39sing(p39, buf, bkg); // "");
       else p39sing(p39, "", buf);
     }else{
       *p++ = '\0';
