@@ -93,6 +93,7 @@ BYTE p39pron_scan(char *lyric)
   for(i = 0; i < pron_len; ++i){
     BYTE idx = pron_match[i];
     if(!strncmp(lyric, pron[idx], strlen(pron[idx]))) return idx;
+    if(!strlen(pron_katakana[idx])) continue;
     if(!strncmp(lyric, pron_katakana[idx], strlen(pron[idx]))) return idx;
   }
   return 0xFF;
