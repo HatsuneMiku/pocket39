@@ -547,7 +547,7 @@ int main(int ac, char **av)
 
   while(fgets(buf, sizeof(buf), stdin)){
     size_t end;
-    char *p;
+    char *p, *q;
 //    fprintf(stdout, buf);
     if(buf[0] == 0x0D || buf[0] == 0x0A) continue;
     if(buf[0] == '#') continue;
@@ -563,6 +563,8 @@ int main(int ac, char **av)
       else p39sing(p39, "", buf);
     }else{
       *p++ = '\0';
+      q = strstr(p, "/");
+      if(q) *q++ = '\0';
       p39sing(p39, buf, p);
     }
   }
