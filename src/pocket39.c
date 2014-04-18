@@ -76,6 +76,8 @@ char pron[][7] = {
 };
 size_t pron_len = sizeof(pron) / sizeof(pron[0]);
 
+char pron_katakana[sizeof(pron) / sizeof(pron[0])][7] = {0};
+
 char pron_ext[] = {
   0x1A, 0x1B, 0x1C, 0x1D, 0x1E, // づぁ づぃ づ づぇ づぉ
   0x78, 0x79, 0x7A, 0x7B, // うぃ うぇ うぉ ん
@@ -91,8 +93,38 @@ BYTE p39pron_scan(char *lyric)
   for(i = 0; i < pron_len; ++i){
     BYTE idx = pron_match[i];
     if(!strncmp(lyric, pron[idx], strlen(pron[idx]))) return idx;
+    if(!strncmp(lyric, pron_katakana[idx], strlen(pron[idx]))) return idx;
   }
   return 0xFF;
+}
+
+UINT p39conv_kana(BYTE *dst, BYTE *src, BYTE mode) // mode 0: h -> k, 1: k -> h
+{
+/*
+  convert UTF-8 hiragana <-> katakana
+  hiragana E38181 'ぁ' - E38293 'ん'
+  katakana E382A1 'ァ' - E383B3 'ン' ( ignore 'ヴ' 'ヵ' 'ヶ' )
+  bytes must be in range 0x80 - 0xBF
+    to katakana = hiragana + 0x0120 (+ 0x00C0 when second byte is 0xA0 - 0xBF)
+    to hiragana = katakana - 0x0120 (- 0x00C0 when second byte is 0x80 - 0x9F)
+*/
+  UINT u8h;
+  dst[0] = dst[1] = dst[2] = '\0';
+  if(src[0] != 0x0e3) return 0;
+  u8h = (src[1] << 8) | src[2];
+  if(!mode){
+    if(u8h < 0x08181 || u8h > 0x08293) return 0;
+    u8h += 0x0120;
+    if(src[2] >= 0x0A0 && src[2] <= 0x0BF) u8h += 0x00C0;
+  }else{
+    if(u8h < 0x082A1 || u8h > 0x083B3) return 0;
+    u8h -= 0x0120;
+    if(src[2] >= 0x080 && src[2] <= 0x09F) u8h -= 0x00C0;
+  }
+  dst[0] = src[0];
+  dst[1] = (u8h >> 8) & 0x0FF;
+  dst[2] = u8h & 0x0FF;
+  return 1;
 }
 
 UINT p39prepare(Pocket39 *p39)
@@ -111,6 +143,14 @@ UINT p39prepare(Pocket39 *p39)
   p39->bend = 512;
   p39->pitch = 0;
   p39->tempo = 240;
+  for(i = 0; i < pron_len; ++i){
+    for(j = 0; j < (sizeof(pron[0]) / sizeof(pron[0][0])) / 3; ++j){
+      int m = j * 3;
+      if(!p39conv_kana((BYTE *)&pron_katakana[i][m], (BYTE *)&pron[i][m], 0))
+        break;
+    }
+  }
+//  for(i = 0; i < pron_len; ++i) fprintf(stdout, " %s", pron_katakana[i]);
   for(j = sizeof(pron[0]) / sizeof(pron[0][0]); --j > 0; )
     for(i = 0; i < pron_len; ++i)
       if(strlen(pron[i]) == j) pron_match[cnt++] = (BYTE)i;
@@ -396,7 +436,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     p39->vel = (*n >> 14) & 0x7F;
     p39->len = (*n >> 21) & 0x03FF;
 #if 1
-    fprintf(stdout, "%08x %3s %6d v(%3d) o(%d) s(%2d) p(%3d) m(%3d) %s\n",
+    fprintf(stdout, "%08x %3s %6d v(%3d) o(%d) s(%3d) p(%3d) m(%3d) %s\n",
       *n, p39tonestr(tonestr, *n),
       p39->len, p39->vel, p39->oct, p39->sft, p39->pitch, p39->mod,
       (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
