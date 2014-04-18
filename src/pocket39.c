@@ -191,6 +191,43 @@ UINT p39wait(Pocket39 *p39, int len)
 #endif
   return 0;
 }
+char *p39tonestr(char *tonestr, UINT n)
+{
+  int s = ((n >> 8) & 0x3F) - 32;
+  int o = (n >> 4) & 0x07;
+  if(n & 0x08){ // quiet
+    // Ex / CC / bend / mod etc...
+    BYTE c = n & 0x07;
+    tonestr[0] = ' ';
+    if(c == 0 || c == 1){
+      tonestr[1] = ' ';
+      tonestr[2] = s ? (s > 0 ? '#' : '=') : ' ';
+    }else if(c == 2 || c == 3){
+      tonestr[1] = ' ';
+      tonestr[2] = s ? (s > 0 ? '#' : '=') : ' ';
+    }else if(c == 4 || c == 5){
+      tonestr[0] = '0' + o;
+      tonestr[1] = ' ';
+      tonestr[2] = ' ';
+    }else{
+      tonestr[1] = ' ';
+      tonestr[2] = ' ';
+    }
+  }else{
+    BYTE k = n & 0x07;
+    if(k == 7){
+      tonestr[0] = ' ';
+      tonestr[1] = 'R';
+      tonestr[2] = ' ';
+    }else{
+      tonestr[0] = '0' + o;
+      tonestr[1] = 'A' + k;
+      tonestr[2] = s ? (s > 0 ? '#' : '=') : ' ';
+    }
+  }
+  tonestr[3] = '\0';
+  return tonestr;
+}
 
 UINT p39note(Pocket39 *p39,
   BYTE ch, BYTE flg, BYTE tone, char sft, char oct, BYTE vel, int len)
@@ -323,8 +360,8 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
         ++q;
       }else sft = 0;
     }else if(d == 'R'){ u |= 7;
-    }else if(d == '+'){ u |= 8; ++pitch;
-    }else if(d == '-'){ u |= 9; --pitch;
+    }else if(d == '+'){ u |= 8; ++sft; // ++pitch;
+    }else if(d == '-'){ u |= 9; --sft; // --pitch;
     }else if(d == '#'){ u |= 10; ++sft;
     }else if(d == '='){ u |= 11; --sft;
     }else if(d == '[' || d == '<'){ u |= 12; ++oct;
@@ -349,6 +386,7 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   *n = 0xFF;
 
   for(v = voice_buf, n = note_buf; *n != 0xFF; ++n){
+    char tonestr[4];
     BYTE ch = p39->ch;
     BYTE k = *n & 0x07;
     BYTE idx = *v;
@@ -358,11 +396,13 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
     p39->vel = (*n >> 14) & 0x7F;
     p39->len = (*n >> 21) & 0x03FF;
 #if 1
-    fprintf(stdout, "%08x %6d v(%3d) o(%d) s(%2d) p(%3d) m(%3d) %s\n",
-      *n, p39->len, p39->vel, p39->oct, p39->sft, p39->pitch, p39->mod,
+    fprintf(stdout, "%08x %3s %6d v(%3d) o(%d) s(%2d) p(%3d) m(%3d) %s\n",
+      *n, p39tonestr(tonestr, *n),
+      p39->len, p39->vel, p39->oct, p39->sft, p39->pitch, p39->mod,
       (*n & 0x08 || (k == 7 && !(idx & 0x80))) ? ".." : s);
 #endif
     if(*n & 0x08){ // quiet
+      if(k == 0 || k == 1) p39shift(p39, ch, p39->sft, p39->len); // pitch
       if(k == 2 || k == 3) p39shift(p39, ch, p39->sft, p39->len);
       if(k == 6)
         p39note(p39, ch, 2, p39->tone, p39->sft, p39->oct, p39->vel, p39->len);
