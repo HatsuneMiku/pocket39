@@ -71,7 +71,7 @@ E=G=B=[E=240]R
     > echo みくだよ / [CEG[C480]R | pocket39
     > pocket39
     おんていもつけられます。 / CEG[CEG[C]]GC]G[C480R
-    うたうこともできます。 / [CFAF[CF]B=FE=]B=480R
+    うたうこともできます。 / CFAF[CF]B=FE=]B=480R
     ^Z
     > pocket39 < fuji3.p39
 
