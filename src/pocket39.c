@@ -284,13 +284,22 @@ UINT p39note(Pocket39 *p39,
   else if(flg == 2) f = P39PKPRESS(ch, d, vel);
   else f = P39PKPRESS(ch, d, vel);
   r = midiOutShortMsg(p39->hMO, f);
+#if 0
 r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 0) << 8) | 0x0f); // 4 5 7 12
 //r = midiOutShortMsg(p39->hMO, (f & 0xFFFFFFF0) | 0x09); // 4 5 7 12
 //r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 12) << 8) | 0x08); // 4 5 7 12
 //r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 7) << 8) | 0x05); // 4 5 7 12
 //r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 4) << 8) | 0x04); // 4 5 7 12
+#endif
   assert(!r);
+#if 1
   if(len) p39wait(p39, len);
+#else
+  if(len){
+    p39wait(p39, len);
+    if(flg) p39note(p39, ch, 0, tone, sft, oct, 0, 0); // vel, len
+  }
+#endif
   return 0;
 }
 
@@ -300,11 +309,13 @@ UINT p39bend(Pocket39 *p39, BYTE ch, int val, int len)
   BYTE msb = (v >> 7) & 0x7F;
   BYTE lsb = v & 0x7F;
   UINT r = midiOutShortMsg(p39->hMO, P39PITCH(ch, lsb, msb));
+#if 0
 r = midiOutShortMsg(p39->hMO, P39PITCH(0x0f, lsb, msb));
 //r = midiOutShortMsg(p39->hMO, P39PITCH(0x09, lsb, msb));
 //r = midiOutShortMsg(p39->hMO, P39PITCH(0x08, lsb, msb));
 //r = midiOutShortMsg(p39->hMO, P39PITCH(0x05, lsb, msb));
 //r = midiOutShortMsg(p39->hMO, P39PITCH(0x04, lsb, msb));
+#endif
   assert(!r);
   if(len) p39wait(p39, len);
   return 0;
