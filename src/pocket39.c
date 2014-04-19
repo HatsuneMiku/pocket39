@@ -43,7 +43,7 @@ typedef struct _Pocket39_tag {
 
 BYTE default_banks[] = {
   0x06, 0x7A, 0x7B, 0x03, 0x04, 0x05, 0x06, 0x07,
-  0x08, 0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+  0x08, 0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x6A
 };
 size_t default_banks_len = sizeof(default_banks) / sizeof(default_banks[0]);
 
@@ -284,6 +284,11 @@ UINT p39note(Pocket39 *p39,
   else if(flg == 2) f = P39PKPRESS(ch, d, vel);
   else f = P39PKPRESS(ch, d, vel);
   r = midiOutShortMsg(p39->hMO, f);
+r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 0) << 8) | 0x0f); // 4 5 7 12
+//r = midiOutShortMsg(p39->hMO, (f & 0xFFFFFFF0) | 0x09); // 4 5 7 12
+//r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 12) << 8) | 0x08); // 4 5 7 12
+//r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 7) << 8) | 0x05); // 4 5 7 12
+//r = midiOutShortMsg(p39->hMO, (f & 0xFFFF00F0) | ((d + 4) << 8) | 0x04); // 4 5 7 12
   assert(!r);
   if(len) p39wait(p39, len);
   return 0;
@@ -295,6 +300,11 @@ UINT p39bend(Pocket39 *p39, BYTE ch, int val, int len)
   BYTE msb = (v >> 7) & 0x7F;
   BYTE lsb = v & 0x7F;
   UINT r = midiOutShortMsg(p39->hMO, P39PITCH(ch, lsb, msb));
+r = midiOutShortMsg(p39->hMO, P39PITCH(0x0f, lsb, msb));
+//r = midiOutShortMsg(p39->hMO, P39PITCH(0x09, lsb, msb));
+//r = midiOutShortMsg(p39->hMO, P39PITCH(0x08, lsb, msb));
+//r = midiOutShortMsg(p39->hMO, P39PITCH(0x05, lsb, msb));
+//r = midiOutShortMsg(p39->hMO, P39PITCH(0x04, lsb, msb));
   assert(!r);
   if(len) p39wait(p39, len);
   return 0;
