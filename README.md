@@ -4,14 +4,16 @@ Pocket39
 Pocket Miku
 -----------
 
-* ポケット・ミク [NSX-39](http://otonanokagaku.net/nsx39/)
+* ポケット・ミク [NSX-39](http://otonanokagaku.net/nsx39/) GAKKEN 大人の科学 特別編集
 
 なにこれ？ / AEFF480R
 ---------------------
 
 CEG[C240]R
 
-ポケット・ミク ( [NSX-39](http://otonanokagaku.net/nsx39/) )
+うたうキーボード / CEG[C240]G240E240C240E240G240R360
+ポケミク こと ポケット・ミク / FA[CFC]AFA[CFC240]A240R360
+( [NSX-39](http://otonanokagaku.net/nsx39/) )
 さんにひらがなで書いたテキストを読んで(喋って)もらうソフトです。
 
 楽譜を一行ごとに並列に書き込んでおくことで、テキストファイルの歌詞を歌ってもらうことも出来ます。
