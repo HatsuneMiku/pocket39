@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # This source must be saved in UTF-8 encoding.
 #
-# pocket39.c
+# p39lib.c
 # Copyright (C) 999hatsune@gmail.com 2014
 # BSD license
 #
-# dmc winmm.lib pocket39.c
+# dmc -WD kernel32.lib winmm.lib p39lib.c
 */
 
 #include <windows.h>
@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#define __P39LIB_MAKE_DLL_
+#include "p39lib.h"
 
 #define P39NOTEOFF(ch, tone, vel) (((vel) << 16) | ((tone) << 8) | (ch) | 0x80)
 #define P39NOTEON(ch, tone, vel) (((vel) << 16) | ((tone) << 8) | (ch) | 0x90)
@@ -24,22 +27,6 @@
 #define P39PITCH(ch, lsb, msb) (((msb) << 16) | ((lsb) << 8) | (ch) | 0xE0)
 
 char *nsx39 = "NSX-39";
-
-typedef struct _Pocket39_tag {
-  HMIDIOUT hMO;
-  BYTE dev_id; // 1
-  BYTE ch; // 0
-  BYTE stat; // 0
-  BYTE mod; // 0
-  BYTE tone; // F (F#4)
-  char sft; // 1 (F#4)
-  char oct; // 4 (F#4)
-  BYTE vel; // 100
-  UINT len; // 120
-  UINT bend; // 50% 512 (1024: C -> D), (-512: F -> E)
-  int pitch; // 0
-  UINT tempo; // 240
-} Pocket39;
 
 BYTE default_banks[] = {
   0x06, 0x7A, 0x7B, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -160,7 +147,7 @@ UINT p39prepare(Pocket39 *p39)
   return 0;
 }
 
-UINT p39reset(Pocket39 *p39)
+__PORT UINT WINAPI p39reset(Pocket39 *p39)
 {
   UINT r;
   assert(p39);
@@ -169,7 +156,7 @@ UINT p39reset(Pocket39 *p39)
   return 0;
 }
 
-Pocket39 *p39open()
+__PORT Pocket39 * WINAPI p39open()
 {
   UINT r;
   int i, n = -1;
@@ -200,7 +187,7 @@ Pocket39 *p39open()
   return p39;
 }
 
-UINT p39close(Pocket39 *p39)
+__PORT UINT WINAPI p39close(Pocket39 *p39)
 {
   UINT r;
   assert(p39);
@@ -211,7 +198,7 @@ UINT p39close(Pocket39 *p39)
   return 0;
 }
 
-UINT p39programs(Pocket39 *p39, BYTE *banks, size_t len)
+__PORT UINT WINAPI p39programs(Pocket39 *p39, BYTE *banks, size_t len)
 {
   int i;
   for(i = 0; i < len; ++i){
@@ -495,152 +482,33 @@ UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
   return 0;
 }
 
-int main(int ac, char **av)
+BOOL APIENTRY DllMain(HINSTANCE inst, DWORD reason, LPVOID reserved)
 {
-  char buf[4096];
-
-  Pocket39 *p39 = p39open();
-  p39programs(p39, default_banks, default_banks_len);
-
-#if 1
-  p39note(p39, 1, 1, 'E', 0, 4, 100, 120);
-#endif
-
-#if 0
-  p39sing(p39, "きしゃのきしゃが、きしゃできしゃした。", "");
-  p39sing(p39, "", "FD]B=[DFB=240F FGF]B=[D360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
-    "--GECEG[C240]G GAGCE360");
-  p39sing(p39, "ふぁみふぁみふぁみま ふぁみふぁみま",
-    "[FD]B=[DFB=240F FGF]B=[D360] R");
-  p39sing(p39, "", "D60R60D60R60D120R60");
-  p39sing(p39, "", "G60R60G60R60G55R5G120R");
-  p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
-  p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
-  p39sing(p39, "てってってー、", "D60R60D60R60D120R60");
-  p39sing(p39, "てってっててー。", "G60R60G60R60G55R5G120R");
-  p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
-  p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
-  p39sing(p39, "てってってー、", "E60R60E60R60E120R60");
-  p39sing(p39, "てってっててー。", "A60R60A60R60A55R5A120R");
-  p39sing(p39, "", "E60R60E60R60E120R60");
-  p39sing(p39, "", "A60R60A60R60A55R5A120R");
-  p39sing(p39, "みく。", "[G60C60]R360");
-  p39sing(p39, "ほー、ほけきょ。けきょ。けきょ。けきょ。",
-    "[G420R60G60[C60]C60R480 [C60]C60R60 [C60]C6R60 [C60]C60R60] R");
-  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[Cv60v20v60v100v127] R");
-  // test for unexpected character
-//  p39sing(p39, "どれみふぁそらしど", "CDEFGAB[C}");
-#endif
-
-#if 0
-  p39voice(p39, 0, 0x00);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 360);
-  p39voice(p39, 0, 0x29);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x64);
-  p39note(p39, 0, 1, 'A', 0, 4, 100, 240);
-  p39voice(p39, 0, 0x04);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 240);
-
-  p39voice(p39, 0, 0x07);
-  p39note(p39, 0, 1, 'E', 0, 4, 100, 240);
-  p39voice(p39, 0, 0x68);
-  p39note(p39, 0, 1, 'C', 0, 4, 100, 120);
-  p39shift(p39, 0, 2, 120);
-  p39note(p39, 0, 0, 'C', 0, 4, 100, 0);
-  p39bend(p39, 0, 0, 0);
-  p39voice(p39, 0, 0x43);
-  p39note(p39, 0, 1, 'E', 0, 4, 100, 360);
-  p39note(p39, 0, 0, 'E', 0, 4, 100, 120);
-
-  p39voice(p39, 0, 0x02);
-  p39note(p39, 0, 1, 'D', 0, 4, 100, 360);
-  p39voice(p39, 0, 0x03);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x40);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 240);
-  p39voice(p39, 0, 0x2E);
-  p39note(p39, 0, 1, 'F', 0, 4, 100, 120);
-  p39shift(p39, 0, -1, 120);
-  p39note(p39, 0, 0, 'F', 0, 4, 100, 0);
-  p39bend(p39, 0, 0, 0);
-  p39voice(p39, 0, 0x20);
-  p39note(p39, 0, 1, 'D', 0, 4, 100, 840);
-  p39note(p39, 0, 0, 'D', 0, 4, 100, 120);
-
-  p39voice(p39, 0, 0x20);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 360);
-  p39voice(p39, 0, 0x4B);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x04);
-  p39note(p39, 0, 1, 'E', 0, 4, 100, 240);
-  p39voice(p39, 0, 0x43);
-  p39note(p39, 0, 1, 'C', 0, 4, 100, 240);
-  p39voice(p39, 0, 0x6C);
-  p39note(p39, 0, 1, 'A', 0, 4, 100, 360);
-  p39voice(p39, 0, 0x00);
-  p39note(p39, 0, 1, 'B', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x64);
-  p39note(p39, 0, 1, 'C', 0, 5, 100, 240);
-  p39voice(p39, 0, 0x04);
-  p39note(p39, 0, 1, 'A', 0, 4, 100, 240);
-
-  p39voice(p39, 0, 0x65);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 360);
-  p39voice(p39, 0, 0x04);
-  p39note(p39, 0, 1, 'A', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x73);
-  p39note(p39, 0, 1, 'G', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x04);
-  p39note(p39, 0, 1, 'F', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x20);
-  p39note(p39, 0, 1, 'E', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x01);
-  p39note(p39, 0, 1, 'D', 0, 4, 100, 120);
-  p39voice(p39, 0, 0x2C);
-  p39note(p39, 0, 1, 'C', 0, 4, 100, 840);
-#endif
-
-#if 0
-  p39sing(p39, "あたまを", "G360GA240G240");
-  p39sing(p39, "くもの", "E240C120#0#E360R");
-  p39sing(p39, "うえにだし", "D360GG240F120=D840R");
-  p39sing(p39, "しほーの", "G360G120=0=0=240C240");
-  p39sing(p39, "やまを", "A360#0#[C240]A240");
-  p39sing(p39, "みおろして", "G360AG120=0=E120=0=C840R");
-  p39sing(p39, "かみなりさまを", "D360DD240D240C120#0#E120#G360R");
-  p39sing(p39, "したにきく", "A360B[C240]A240G840R");
-  p39sing(p39, "ふじは", "[C480]A240F240");
-  p39sing(p39, "にっぽん", "E360RA240G240");
-  p39sing(p39, "いちのやま", "F240E240D360CC840R");
-#endif
-
-  while(fgets(buf, sizeof(buf), stdin)){
-    size_t end;
-    char *p, *q;
-//    fprintf(stdout, buf);
-    if(buf[0] == 0x0D || buf[0] == 0x0A) continue;
-    if(buf[0] == '#') continue;
-    end = strlen(buf) - 1;
-    if(buf[end] == 0x0D || buf[end] == 0x0A) buf[end] = '\0';
-    end = strlen(buf) - 1;
-    if(buf[end] == 0x0D || buf[end] == 0x0A) buf[end] = '\0';
-    p = strstr(buf, "/");
-    if(!p){
-      int i;
-      char *bkg = "DFFFGFFFGB=B=B#B=GFRB=B=GFGGFDF60R60D60D60F60R60D60D60CCC==RRREGGGAGGGAB#B#B###B#AGRB#B#AGAAGEG60R60E60E60G60R60E60E60DDCRRR";
-      for(i = 0; i < strlen(buf); ++i) if(buf[i] & 0x80) break;
-      if(i != strlen(buf)) p39sing(p39, buf, bkg); // "");
-      else p39sing(p39, "", buf);
-    }else{
-      *p++ = '\0';
-      q = strstr(p, "/");
-      if(q) *q++ = '\0';
-      p39sing(p39, buf, p);
-    }
+  switch(reason){
+  case DLL_PROCESS_ATTACH:
+    break;
+  case DLL_PROCESS_DETACH:
+    break;
+  case DLL_THREAD_ATTACH:
+    break;
+  case DLL_THREAD_DETACH:
+    break;
+  default:
+    break;
   }
+  return TRUE;
+}
 
-  p39close(p39);
-  return 0;
+__PORT UINT WINAPI p39singW(Pocket39 *p39,wchar_t *lyrics, wchar_t *notes)
+{
+#if 0
+  FILE *fp = fopen("c:\\prj\\dprj\\pocket39\\p39lib.log", "ab");
+  fprintf(fp, "%d, %d\n", wcslen(lyrics), wcslen(notes));
+  fwprintf(fp, L"%s\n", lyrics);
+  fwprintf(fp, L"%s\n", notes);
+  fprintf(fp, "p39 %08x\n", p39);
+  fclose(fp);
+#endif
+  if(p39) p39sing(p39, "あ", "F#");
+  return wcslen(lyrics);
 }

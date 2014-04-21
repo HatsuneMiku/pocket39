@@ -1,0 +1,12 @@
+LIBRARY "p39lib.dll"
+DESCRIPTION 'p39lib as a DLL'
+EXETYPE NT
+SUBSYSTEM WINDOWS
+CODE SHARED EXECUTE
+DATA WRITE
+EXPORTS
+  p39open
+  p39close
+  p39reset
+  p39programs
+  p39singW

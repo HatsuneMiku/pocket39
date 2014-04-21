@@ -26,8 +26,10 @@ void CALLBACK MyMidiInProc(HMIDIIN hMidiIn,
   UINT msg, DWORD inst, DWORD p1, DWORD p2)
 {
   static UINT tick = 0;
+  static UINT range = 8;
   static BYTE flg = 0;
   static BYTE tone = 0x4E;
+  static BYTE offset = 0;
   static short pitch = 0;
   UINT bend = (p1 >> 8) & 0x0FFFF;
   UINT vel = (p1 >> 16) & 0x0FF;
@@ -38,15 +40,18 @@ void CALLBACK MyMidiInProc(HMIDIIN hMidiIn,
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   };
   if(msg != 0x03C3) return;
-  if(f == 0x0E) pitch = (bend - 0x4000) / 0x0400; // touch after
-  else if(f == 0x08) flg = 0; // Note off
-  else if(f == 0x09) flg = 1, tone = d + pitch, tick = p2; // Note on
+  if(f == 0x0E) pitch = (bend - 0x4000) / 0x0400; // touch after (before)
+  else if(f == 0x08) flg = 0, offset = 0; // Note off
+  else if(f == 0x09) flg = 1, offset = 0x4000 + pitch * 0x0400, tone = d + pitch, tick = p2; // Note on
   else ;
-  fprintf(stdout, "%08x, %08x, %08x, %08x : b(%04x), p(%6d), %2d %4s %6d\n",
-    msg, inst, p1, p2, bend, pitch,
+  fprintf(stdout, "%08x, %08x, %08x, %08x : b(%04x), p(%4d), %2d %4s %6d\n",
+    msg, inst, p1, p2,
+    f == 0x0E ? (bend - offset) : 0,
+    pitch,
     (tone / 12) - 2,
     f == 0x0E ? (flg ? (bend >= 0x4000 ? "+" : "-") : "") : tonestr[tone % 12],
-    p2 - tick);
+    p2 - tick
+  );
   if(f == 0x80) tick = p2;
 }
 
