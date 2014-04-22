@@ -3,6 +3,10 @@
 '''
 DLLs from OpenMIDI project http://openmidiproject.sourceforge.jp/
 C:\prj\tools\python\MIDI
+'''
+
+import ctypes
+import time
 
 mididatalib = ctypes.windll.LoadLibrary(r".\MIDIData.dll")
 # mididata = mididatalib.MIDIData_Create(2, 1, 24, 120)
@@ -29,12 +33,8 @@ mididatalib.MIDITrack_InsertNote(miditrack, 600, 1, 75, 40, 120)
 mididatalib.MIDITrack_InsertNote(miditrack, 720, 0, 62, 80, 240)
 mididatalib.MIDITrack_InsertNote(miditrack, 720, 1, 73, 40, 240)
 mididatalib.MIDITrack_InsertEndofTrack(miditrack, 960)
-mididatalib.MIDIData_SaveAsSMF(mididata, "test_midi_04.mid")
+mididatalib.MIDIData_SaveAsSMF(mididata, "smftest0.mid")
 mididatalib.MIDIData_Delete(mididata)
-'''
-
-import ctypes
-import time
 
 midiiolib = ctypes.windll.LoadLibrary(r".\MIDIIO.dll")
 c_deviceName = ctypes.create_string_buffer(32)
