@@ -93,7 +93,7 @@ E=G=B=[E=240]R
 
 kaerunouta.xls
 
-zip 同梱の p39lib.dll を windows の 32bit 用のシステムディレクトリ (例えば 64bitOS のときは C:\Windows\SysWOW64 あるいは 32bit OS のときは C:\Windows\System32 ) にコピー。あとエクセルの方でセキュリティの設定を「中」のマクロ有効にしてください。
+zip 同梱の p39lib.dll を 環境変数 PATH のある場所に置くか windows の 32bit 用のシステムディレクトリ (例えば 64bit OS のときは C:\Windows\SysWOW64 あるいは 32bit OS のときは C:\Windows\System32 ) にコピー。あとエクセルの方でセキュリティの設定を「中」のマクロ有効にしてください。
 
 もくひょう / DGCG480R
 ---------------------

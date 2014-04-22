@@ -343,7 +343,7 @@ int p39get_number(char **p)
   return num;
 }
 
-UINT p39sing(Pocket39 *p39, char *lyrics, char *notes)
+UINT p39singUTF8(Pocket39 *p39, char *lyrics, char *notes)
 {
   int num;
   int pitch = p39->pitch;
@@ -499,16 +499,39 @@ BOOL APIENTRY DllMain(HINSTANCE inst, DWORD reason, LPVOID reserved)
   return TRUE;
 }
 
+char *wcs2utf8(wchar_t *wbuf)
+{
+  int ulen = WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, NULL, 0, NULL, NULL);
+  char *ubuf = (char *)malloc((ulen + 1) * sizeof(char));
+  if(!ubuf) return ubuf;
+  *ubuf = '\0';
+  if(WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, ubuf, ulen, NULL, NULL) <= 0){
+    free(ubuf);
+    return NULL;
+  }
+  ubuf[ulen] = '\0';
+  return ubuf; // *** must be free later ***
+}
+
 __PORT UINT WINAPI p39singW(Pocket39 *p39,wchar_t *lyrics, wchar_t *notes)
 {
+  int r = wcslen(lyrics);
+  char *utf8_lyrics, *utf8_notes;
+  utf8_lyrics = wcs2utf8(lyrics);
+  if(!utf8_lyrics) return r;
+  utf8_notes = wcs2utf8(notes);
+  if(!utf8_notes){
+    free(utf8_lyrics);
+    return r;
+  }
+  if(p39) p39singUTF8(p39, utf8_lyrics, utf8_notes);
+  free(utf8_notes);
+  free(utf8_lyrics);
 #if 0
   FILE *fp = fopen("c:\\prj\\dprj\\pocket39\\p39lib.log", "ab");
-  fprintf(fp, "%d, %d\n", wcslen(lyrics), wcslen(notes));
-  fwprintf(fp, L"%s\n", lyrics);
-  fwprintf(fp, L"%s\n", notes);
-  fprintf(fp, "p39 %08x\n", p39);
+//  fprintf(fp, "%d, %d\n", r, wcslen(notes));
+  fprintf(fp, "%s / %s\n", utf8_lyrics, utf8_notes);
   fclose(fp);
 #endif
-  if(p39) p39sing(p39, "あ", "F#");
-  return wcslen(lyrics);
+  return r;
 }
