@@ -132,6 +132,6 @@ EA[C#E#240]R
 
 [C]GEC240R
 
+- BSD license
 - python フォルダ内のファイルは各種テスト用です。
 - ( [OpenMIDI project](http://openmidiproject.sourceforge.jp/) ) は必須ではありませんが、あると便利。
-- BSD license
