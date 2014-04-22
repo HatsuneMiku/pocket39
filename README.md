@@ -132,5 +132,6 @@ EA[C#E#240]R
 
 [C]GEC240R
 
-- pocket39.py はテスト用です。参照 ( [OpenMIDI project](http://openmidiproject.sourceforge.jp/) )
+- python フォルダ内のファイルは各種テスト用です。
+- ( [OpenMIDI project](http://openmidiproject.sourceforge.jp/) ) は必須ではありませんが、あると便利。
 - BSD license
