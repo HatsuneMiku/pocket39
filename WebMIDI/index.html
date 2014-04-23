@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Web MIDI API test</title>
+<script type="text/javascript" src="./js/WebMIDIAPI.js"></script>
+<script type="text/javascript">
+var e_m_in, e_m_ic, e_m_out, e_m_oc, e_status;
+var midi, m_in, m_ic, m_out, m_oc, d_in, d_out;
+var acceptor = function(ma){
+  var i;
+  midi = ma;
+  if(ma == null) alert('invalid MIDI Accessor');
+  m_in = midi.inputs();
+  e_m_ic.innerHTML = 'Input Devices: ' + (m_ic = m_in.length);
+  for(i = 0; i < m_ic; ++i)
+    e_m_in.innerHTML += '' + i + ': [' + m_in[i].name + ']<br>';
+  m_out = midi.outputs();
+  e_m_oc.innerHTML = 'Output Devices: ' + (m_oc = m_out.length);
+  for(i = 0; i < m_oc; ++i)
+    e_m_out.innerHTML += '' + i + ': [' + m_out[i].name + ']<br>';
+  e_status.innerHTML = 'OK';
+
+  if(m_ic > 0) d_in = m_in[m_ic - 1];
+  if(m_oc > 0){
+    d_out = m_out[m_oc - 1];
+    d_out.send([0xCF, 0x08]);
+    d_out.send([0x9F, 0x64, 0x64]);
+  }
+};
+var rejector = function(er){
+  e_status.innerHTML = 'MIDI access rejected: ' + er;
+};
+var midi_main = function(){
+  e_m_in = document.getElementById('m_in');
+  e_m_ic = document.getElementById('m_ic');
+  e_m_out = document.getElementById('m_out');
+  e_m_oc = document.getElementById('m_oc');
+  e_status = document.getElementById('status');
+  navigator.requestMIDIAccess({sysex: true}).then(acceptor, rejector);
+};
+</script>
+</head>
+<body onLoad="midi_main();">
+<div><img src="./img/p39.png" border="0"></div>
+<p>Web MIDI API test</p>
+<table border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
+<tr>
+  <td id="m_ic" name="m_ic" bgcolor="#CCCCCC"></td>
+  <td id="m_in" name="m_in" bgcolor="#CCCCCC"></td>
+</tr>
+<tr>
+  <td id="m_oc" name="m_oc" bgcolor="#CCCCCC"></td>
+  <td id="m_out" name="m_out" bgcolor="#CCCCCC"></td>
+</tr>
+<tr>
+  <td bgcolor="#CCCCCC">Status:</td>
+  <td id="status" name="status" bgcolor="#CCCCCC"></td>
+</tr>
+</table>
+</body>
+</html>
