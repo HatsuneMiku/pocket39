@@ -30,8 +30,8 @@
   <td id="status" bgcolor="#CCCCCC"></td>
 </tr>
 <tr>
-  <td bgcolor="#CCCCCC">Notes:</td>
-  <td id="notes" bgcolor="#CCCCCC"></td>
+  <td bgcolor="#CCCCCC">Info:</td>
+  <td id="info" bgcolor="#CCCCCC"></td>
 </tr>
 </table>
 </div>
@@ -39,11 +39,31 @@
 <p id="keyboard"></p>
 </div>
 <div>
+<form>
+<input type="button" id="save" value="保存">
+<input type="button" id="replay" value="再生">
+<input type="button" id="erase" value="消去">
+</form>
+<table border="0" cellpadding="2" cellspacing="2">
+<tr>
+  <td>(下へ行くほど古いデータです)</td>
+  <td>(入力された順)</td>
+  <td>(演奏用)</td>
+</tr>
+<tr>
+  <td><textarea id="notes" rows="10" cols="50"></textarea></td>
+  <td><textarea id="notes_reverse" rows="10" cols="50"></textarea></td>
+  <td><textarea id="notes_play" rows="10" cols="50"></textarea></td>
+</tr>
+</table>
+</div>
+<div>
 <p>ポケミクキーボードからの入力を記録します。</p>
 <p>「4F#＋ピッチベンド」形式のデータを、押されたキーの音名に補正します。</p>
 <p>リボンスライド時は「最初に押された場所の音名＋ピッチベンド」にします。</p>
 <p>補正モードを変更出来るようにします。</p>
 <p>録音・再生と SMF ファイルのダウンロードを出来るようにします。</p>
+<p>ソース <a href="http://HatsuneMiku.github.io/pocket39/" target="_blank">http://HatsuneMiku.github.io/pocket39/</a></p>
 </div>
 </body>
 </html>
