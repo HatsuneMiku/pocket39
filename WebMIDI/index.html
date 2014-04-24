@@ -1,61 +1,49 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Web MIDI API test</title>
-<script type="text/javascript" src="./js/WebMIDIAPI.js"></script>
-<script type="text/javascript">
-var e_m_in, e_m_ic, e_m_out, e_m_oc, e_status;
-var midi, m_in, m_ic, m_out, m_oc, d_in, d_out;
-var acceptor = function(ma){
-  var i;
-  midi = ma;
-  if(ma == null) alert('invalid MIDI Accessor');
-  m_in = midi.inputs();
-  e_m_ic.innerHTML = 'Input Devices: ' + (m_ic = m_in.length);
-  for(i = 0; i < m_ic; ++i)
-    e_m_in.innerHTML += '' + i + ': [' + m_in[i].name + ']<br>';
-  m_out = midi.outputs();
-  e_m_oc.innerHTML = 'Output Devices: ' + (m_oc = m_out.length);
-  for(i = 0; i < m_oc; ++i)
-    e_m_out.innerHTML += '' + i + ': [' + m_out[i].name + ']<br>';
-  e_status.innerHTML = 'OK';
-
-  if(m_ic > 0) d_in = m_in[m_ic - 1];
-  if(m_oc > 0){
-    d_out = m_out[m_oc - 1];
-    d_out.send([0xCF, 0x08]);
-    d_out.send([0x9F, 0x64, 0x64]);
-  }
-};
-var rejector = function(er){
-  e_status.innerHTML = 'MIDI access rejected: ' + er;
-};
-var midi_main = function(){
-  e_m_in = document.getElementById('m_in');
-  e_m_ic = document.getElementById('m_ic');
-  e_m_out = document.getElementById('m_out');
-  e_m_oc = document.getElementById('m_oc');
-  e_status = document.getElementById('status');
-  navigator.requestMIDIAccess({sysex: true}).then(acceptor, rejector);
-};
-</script>
+<meta name="Keywords" content="Web,MIDI,API,ポケミク,大人の科学,キーボード">
+<title>ポケミク Web MIDI API test</title>
+<script type="text/javascript" src="./js/WebMIDIAPI.js" charset="UTF-8"></script>
+<script type="text/javascript" src="./js/p39wmidi.js" charset="UTF-8"></script>
 </head>
-<body onLoad="midi_main();">
+<body onLoad="p39_create();">
 <div><img src="./img/p39.png" border="0"></div>
-<p>Web MIDI API test</p>
+<div>
+<p>ポケミク (大人の科学 歌うキーボード) Web MIDI API test</p>
+<p>ブラウザは Chrome をお使いください。</p>
+<p>Web MIDI API の実行には Chrome の設定変更
+ chrome://flags/#enable-web-midi
+と再起動が必要です。</p>
+</div>
+<div>
 <table border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
 <tr>
-  <td id="m_ic" name="m_ic" bgcolor="#CCCCCC"></td>
-  <td id="m_in" name="m_in" bgcolor="#CCCCCC"></td>
+  <td id="m_ic" bgcolor="#CCCCCC">Input Devices: </td>
+  <td id="m_in" bgcolor="#CCCCCC"></td>
 </tr>
 <tr>
-  <td id="m_oc" name="m_oc" bgcolor="#CCCCCC"></td>
-  <td id="m_out" name="m_out" bgcolor="#CCCCCC"></td>
+  <td id="m_oc" bgcolor="#CCCCCC">Output Devices: </td>
+  <td id="m_out" bgcolor="#CCCCCC"></td>
 </tr>
 <tr>
   <td bgcolor="#CCCCCC">Status:</td>
-  <td id="status" name="status" bgcolor="#CCCCCC"></td>
+  <td id="status" bgcolor="#CCCCCC"></td>
+</tr>
+<tr>
+  <td bgcolor="#CCCCCC">Notes:</td>
+  <td id="notes" bgcolor="#CCCCCC"></td>
 </tr>
 </table>
+</div>
+<div>
+<p id="keyboard"></p>
+</div>
+<div>
+<p>ポケミクキーボードからの入力を記録します。</p>
+<p>「4F#＋ピッチベンド」形式のデータを、押されたキーの音名に補正します。</p>
+<p>リボンスライド時は「最初に押された場所の音名＋ピッチベンド」にします。</p>
+<p>補正モードを変更出来るようにします。</p>
+<p>録音・再生と SMF ファイルのダウンロードを出来るようにします。</p>
+</div>
 </body>
 </html>
