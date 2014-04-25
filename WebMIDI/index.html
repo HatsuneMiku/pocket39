@@ -7,12 +7,15 @@
 <script type="text/javascript" src="./js/p39wmidi.js" charset="UTF-8"></script>
 </head>
 <body onLoad="p39_create();">
-<div><img src="./img/p39.png" border="0"></div>
 <div>
-<p>ポケミク (大人の科学 歌うキーボード) Web MIDI API test</p>
-<p>ブラウザは Chrome をお使いください。
- ( Web MIDI API の実行には Chrome の設定変更
- chrome://flags/#enable-web-midi
+<table border="0" cellpadding="2" cellspacing="2" width="748" bgcolor="#99DDCC">
+<tr>
+  <td>
+<div>
+<p><b>ポケミク (大人の科学 歌うキーボード) Web MIDI API test</b><br>
+ブラウザは Chrome をお使いください。<br>
+ ( Web MIDI API の実行には Chrome の設定変更<br>
+ chrome://flags/#enable-web-midi<br>
 と再起動が必要です。 )</p>
 </div>
 <div>
@@ -35,8 +38,12 @@
 </tr>
 </table>
 </div>
-<div>
-<p id="keyboard"></p>
+  </td>
+  <td align="right" valign="bottom">
+    <div><img src="./img/p39.png" border="0"></div>
+  </td>
+</tr>
+</table>
 </div>
 <div>
 <form>
@@ -44,6 +51,11 @@
 <input type="button" id="replay" value="再生">
 <input type="button" id="erase" value="消去">
 </form>
+</div>
+<div>
+<p id="keyboard"></p>
+</div>
+<div>
 <table border="0" cellpadding="2" cellspacing="2">
 <tr>
   <td>(下へ行くほど古いデータです)</td>
@@ -58,11 +70,16 @@
 </table>
 </div>
 <div>
-<p>ポケミクキーボードからの入力を記録します。</p>
-<p>「4F#＋ピッチベンド」形式のデータを、押されたキーの音名に補正します。</p>
-<p>リボンスライド時は「最初に押された場所の音名＋ピッチベンド」にします。</p>
-<p>補正モードを変更出来るようにします。</p>
-<p>録音・再生と SMF ファイルのダウンロードを出来るようにします。</p>
+<p>ポケミクキーボードからの入力を記録します。<br>
+「4F#＋ピッチベンド」形式のデータを、押されたキーの音名に補正します。<br>
+リボンスライド時は「最初に押された場所の音名＋ピッチベンド」にします。<br>
+<font color="#FF3333"><b>
+(現バージョンでは記録時の補正はしますが、再生時の補正はしていません。<br>
+つまり光るキーがずれる時があります。これはバグですので近い将来なおします。)<br>
+</b></font>
+補正モード(しない/する/ベンド中の音も補正/ピッチベンドセンシティブも補正)
+等を変更出来るようにします。<br>
+録音・再生と SMF ファイルのダウンロードを出来るようにします。</p>
 <p>ソース <a href="http://HatsuneMiku.github.io/pocket39/" target="_blank">http://HatsuneMiku.github.io/pocket39/</a></p>
 </div>
 </body>
