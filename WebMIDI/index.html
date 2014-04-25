@@ -48,7 +48,7 @@
 <div>
 <table border="0" cellpadding="2" cellspacing="4" width="100%">
 <tr>
-  <td bgcolor="#FFFFFF">
+  <td bgcolor="#FFFFFF" valign="top">
 <form>
     <input type="radio" id="save_opt_0" name="save_opt" value="0" checked>RAW data
     <input type="radio" id="save_opt_1" name="save_opt" value="1">SMF ver.0
@@ -56,15 +56,17 @@
     <input type="button" id="save" value="保存">
 </form>
   </td>
-  <td bgcolor="#FFFFFF">
+  <td bgcolor="#FFFFFF" valign="top">
 <form>
     精度 (<span id="replay_opt_v">10</span> msec)
     <input type="radio" id="replay_opt_0" name="replay_opt" value="0" checked>低
     <input type="radio" id="replay_opt_1" name="replay_opt" value="1">高
     <input type="button" id="replay" value="再生">
+    <br>テストデータで再生
+    <input type="button" id="testplay" value="再生(テスト)">
 </form>
   </td>
-  <td bgcolor="#FFFFFF">
+  <td bgcolor="#FFFFFF" valign="top">
 <form>
     <input type="button" id="erase" value="消去">
 </form>

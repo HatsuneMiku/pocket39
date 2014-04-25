@@ -34,17 +34,15 @@
   var cmd = 0;
 
   var tbl_out = null;
-  var rlo_max = 1;
-  var rlo_idx = 0;
   var tbl_in = null;
-  var rli_max = 1;
-  var rli_idx = 0;
 
   var el = {};
 
   var midi, m_in, m_ic, m_out, m_oc, d_in, d_out;
   var Pocket39;
   var p39;
+
+  var sample = 'e00030 9a0f4e5b\n904e63 9a0f4e5c\n804e00 9a0f4fdf\ne00028 9a0f506d\n904e63 9a0f506d\n804e00 9a0f511e\ne00020 9a0f51e2\n904e63 9a0f51e2\n804e00 9a0f538b\ne00028 9a0f5406\n904e63 9a0f5408\n804e00 9a0f54d6\ne00030 9a0f5538\n904e63 9a0f5539\n804e00 9a0f5705\ne00034 9a0f5779\n904e63 9a0f577a\n804e00 9a0f584d\ne0003c 9a0f58c3\n904e63 9a0f58dd\n804e00 9a0f5a61\ne00034 9a0f5af0\n904e63 9a0f5af1\n804e00 9a0f5bda\ne00030 9a0f5c2b\n904e63 9a0f5c2d\n804e00 9a0f5fee\ne00028 9a0f60ba\n904e63 9a0f60bc\n804e00 9a0f6176\ne00020 9a0f6222\n904e63 9a0f6223\n804e00 9a0f631b\ne00030 9a0f6392\n904e63 9a0f6395\n804e00 9a0f64a0\ne00028 9a0f64fa\n904e63 9a0f64fc\n804e00 9a0f65bd\ne00020 9a0f668a\n904e63 9a0f668b\n804e00 9a0f679a\ne0001c 9a0f682c\n904e63 9a0f682f\n804e00 9a0f6ab9\ne0001c 9a0f6b4d\n904e63 9a0f6b4d\n804e00 9a0f6f3c\ne00028 9a0f7025\n904e63 9a0f7026\n804e00 9a0f70ee\ne00020 9a0f7192\n904e63 9a0f7193\n804e00 9a0f729e\ne0001c 9a0f7302\n904e63 9a0f7303\n804e00 9a0f7414\ne00014 9a0f7478\n904e63 9a0f7479\n804e00 9a0f7e9e\ne00030 9a0f8012\n904e63 9a0f8013\n804e00 9a0f817c\ne00028 9a0f81d7\n904e63 9a0f81d8\n804e00 9a0f827e\ne00020 9a0f8312\n904e63 9a0f8313\n804e00 9a0f8473\ne00028 9a0f8501\n904e63 9a0f8502\n804e00 9a0f8599\ne00030 9a0f85f5\n904e63 9a0f85f6\n804e00 9a0f877f\ne00034 9a0f88c3\n904e63 9a0f88c4\n804e00 9a0f8910\ne0003c 9a0f898c\n904e63 9a0f898d\n804e00 9a0f8b13\ne00034 9a0f8bc4\n904e63 9a0f8bc5\n804e00 9a0f8c7f\ne00030 9a0f8cd4\n904e63 9a0f8cd4\n804e00 9a0f9030\ne00028 9a0f9114\n904e63 9a0f9115\n804e00 9a0f91f3\ne00020 9a0f9299\n904e63 9a0f929a\n804e00 9a0f9471\ne00038 9a0f95ad\n904e63 9a0f95ae\n804e00 9a0f97d8\ne0003c 9a0f986d\n904e63 9a0f986e\n804e00 9a0f996b\ne00030 9a0f99ec\n904e63 9a0f99ed\n804e00 9a0f9af3\ne00020 9a0f9bc6\n904e63 9a0f9bc8\n804e00 9a0f9cb0\ne0000c 9a0f9d51\n904e63 9a0f9d52\n804e00 9a0f9e50\ne00030 9a0f9f4c\n904e63 9a0f9f4d\n804e00 9a0fa038\ne00030 9a0fa0c7\n904e63 9a0fa0cb\n804e00 9a0fa2f5\ne00028 9a0fa385\n904e63 9a0fa386\n804e00 9a0fa49c\ne00020 9a0fa503\n904e63 9a0fa504\n804e00 9a0fac58\ne00020 9a0fad41\n904e63 9a0fad42\n804e00 9a0faeed\ne00034 9a0fb06c\n904e63 9a0fb06d\n804e00 9a0fb41e\ne00034 9a0fb4de\n904e63 9a0fb4e0\n804e00 9a0fb5ff\ne00034 9a0fb66b\n904e63 9a0fb66c\n804e00 9a0fb783\ne00030 9a0fb7cf\n904e63 9a0fb7d0\n804e00 9a0fb8d5\ne00028 9a0fb93d\n904e63 9a0fb93e\n804e00 9a0fba0f\ne00034 9a0fba92\n904e63 9a0fba96\n804e00 9a0fbbac\ne00030 9a0fbc17\n904e63 9a0fbc18\n804e00 9a0fc1ef\ne00020 9a0fc31c\n904e63 9a0fc31e\n804e00 9a0fc422\ne00020 9a0fc486\n904e63 9a0fc48b\n804e00 9a0fc57b\ne00020 9a0fc5e4\n904e63 9a0fc5ee\n804e00 9a0fc6ce\ne00028 9a0fc764\n904e63 9a0fc769\n804e00 9a0fc9a1\ne00028 9a0fca4b\n904e63 9a0fca4c\n804e00 9a0fcca5\ne00030 9a0fcd38\n904e63 9a0fcd3b\n804e00 9a0fd0a6\ne00028 9a0fd16a\n904e63 9a0fd16f\n804e00 9a0fd22e\ne00020 9a0fd2cc\n904e63 9a0fd2ce\n804e00 9a0fda5c\ne00020 9a0fdb26\n904e63 9a0fdb27\n804e00 9a0fdd76\ne00034 9a0fde5c\n904e63 9a0fde5d\n804e00 9a0fe1f1\ne00038 9a0fe2bb\n904e63 9a0fe2be\ne00034 9a0fe2dd\n804e00 9a0fe3ad\ne00034 9a0fe41c\n904e63 9a0fe41e\n804e00 9a0fe536\ne00030 9a0fe58e\n904e63 9a0fe591\n804e00 9a0fe661\ne00028 9a0fe6ca\n904e63 9a0fe6cf\n804e00 9a0fe7a3\ne00034 9a0fe819\n904e63 9a0fe81c\n804e00 9a0fe936\ne00030 9a0fe9ab\n904e63 9a0fe9ac\n804e00 9a0fefed\ne00030 9a0ff0cd\n904e63 9a0ff0ce\n804e00 9a0ff1a4\ne00030 9a0ff21f\n904e63 9a0ff221\n804e00 9a0ff33d\ne00030 9a0ff39f\n904e63 9a0ff3a1\n804e00 9a0ff488\ne00030 9a0ff4fb\n904e63 9a0ff4fc\n804e00 9a0ff719\ne00030 9a0ff804\n904e63 9a0ff807\n804e00 9a0ff9d0\ne00030 9a0ffad5\n904e63 9a0ffad7\n804e00 9a0ffcae\ne00044 9a0ffdb5\n904e63 9a0ffdb7\n804e00 9a0fffe1\ne00030 9a1000df\n904e63 9a1000e3\ne0002c 9a1003c5\ne00028 9a1003d8\ne00024 9a1006bc\ne00020 9a1009e6\ne0001c 9a1009f9\ne00018 9a100ca8\n804e00 9a100cd4\ne00014 9a100ce7\n904e63 9a100ce9\n804e00 9a100f14\ne0001c 9a100fbe\n904e63 9a100fbf\n804e00 9a10114e\ne00024 9a1011b7\n904e63 9a1011b8\n804e00 9a101274\ne00014 9a1012d8\n904e63 9a1012d9\n804e00 9a101428\ne00014 9a1014bc\n904e63 9a1014bd\n804e00 9a101570\ne0001c 9a1015cd\n904e63 9a1015cf\n804e00 9a101732\ne00024 9a1017a3\n904e63 9a1017a4\n804e00 9a101883\ne00014 9a1018e3\n904e63 9a1018e5\n804e00 9a101f57\ne00014 9a102021\n904e63 9a102023\n804e00 9a10210f\ne0001c 9a102181\n904e63 9a102183\n804e00 9a1022d7\ne00024 9a102349\n904e63 9a10234b\n804e00 9a10243d\ne00028 9a102499\n904e63 9a10249b\n804e00 9a102848\ne00028 9a102931\n904e63 9a102932\n804e00 9a102a21\ne00024 9a102a7d\n904e63 9a102a7f\n804e00 9a102bb0\ne00014 9a102c91\n904e63 9a102c93\n804e00 9a102d4b\ne00014 9a102d99\n904e63 9a102d9b\n804e00 9a102f0e\ne00014 9a102f8f\n904e63 9a102f91\n804e00 9a103064\ne0001c 9a1030c6\n904e63 9a1030c8\n804e00 9a103a6c\ne0001c 9a103c12\n904e63 9a103c14\n804e00 9a103e22\ne00024 9a103ea7\n904e63 9a103eab\n804e00 9a104093\ne00028 9a1040f8\n904e63 9a1040fb\n804e00 9a1041be\ne0001c 9a104222\n904e63 9a104227\n804e00 9a104373\ne0001c 9a104410\n904e63 9a104412\n804e00 9a1044ce\ne00024 9a10451d\n904e63 9a104521\n804e00 9a10468f\ne00028 9a10471a\n904e63 9a104721\n804e00 9a1047c9\ne0001c 9a10482a\n904e63 9a10482c\n804e00 9a104e2e\ne00038 9a104f8c\n904e63 9a104f92\n804e00 9a105092\ne00040 9a105117\n904e63 9a105118\n804e00 9a105218\ne00038 9a10528c\n904e63 9a105293\n804e00 9a105388\ne00030 9a1053e8\n904e63 9a1053ea\n804e00 9a1054e1\ne00044 9a10558a\n904e63 9a10558e\n804e00 9a10567d\ne00030 9a10573f\n904e63 9a105740\n804e00 9a105854\ne00024 9a105c5d\n904e63 9a105c5f\n804e00 9a105e14\ne0001c 9a105e8b\n904e63 9a105e8f\n804e00 9a106282\ne00014 9a106317\n904e63 9a10631a\n804e00 9a1063f8\ne00014 9a1064a1\n904e63 9a1064a3\n804e00 9a106e69\n';
 
   function toHex(b, w){
     var s = ('0' * w) + b.toString(16);
@@ -55,7 +53,7 @@
     this.getEl([
       'm_in', 'm_ic', 'm_out', 'm_oc', 'status', 'info',
       'save_opt_0', 'save_opt_1', 'save_opt_2', 'save',
-      'replay_opt_v', 'replay_opt_0', 'replay_opt_1', 'replay',
+      'replay_opt_v', 'replay_opt_0', 'replay_opt_1', 'replay', 'testplay',
       'erase',
       'rollout', 'keyboard', 'rollin',
       'notes', 'notes_reverse', 'notes_play']);
@@ -96,6 +94,7 @@
     }
     el['save'].onclick = p39.onsave;
     el['replay'].onclick = p39.onreplay;
+    el['testplay'].onclick = p39.ontestplay;
     el['erase'].onclick = p39.onerase;
   }
 
@@ -155,7 +154,7 @@
     if(k) k.style.background = k.id[1] == 'b' ? c39gray : c39white;
     {
       var n = p39.getNoteNum(o, t);
-      tbl_out.rows[rlo_idx].cells[n].style.height = d / 10;
+      tbl_out.rows[tbl_out.rows.length - 1].cells[n].style.height = d / 10;
     }
   }
 
@@ -164,9 +163,10 @@
     if(k) p39.flashkey(k, c39hilight, 0);
     {
       var n = p39.getNoteNum(o, t);
-      tbl_out.insertRow(rlo_idx = rlo_max++);
-      tbl_out.rows[rlo_idx].innerHTML = tbl_out.rows[0].innerHTML;
-      tbl_out.rows[rlo_idx].cells[n].style.background = c39hilight;
+      var l = tbl_out.rows.length;
+      tbl_out.insertRow(l);
+      tbl_out.rows[l].innerHTML = tbl_out.rows[0].innerHTML;
+      tbl_out.rows[l].cells[n].style.background = c39hilight;
     }
   }
 
@@ -204,13 +204,9 @@
     p.innerHTML = '';
     {
       tbl_in.innerHTML = tbl_out.innerHTML;
-      rli_max = rlo_max;
-      rli_idx = rlo_idx;
       tbl_out.innerHTML = '';
       tbl_out.insertRow(-1);
       tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
-      rlo_max = 1;
-      rlo_idx = 0;
     }
     if(m_oc > 0 && txt != ''){
       var lines = txt.split('\n');
@@ -238,17 +234,20 @@
         p.innerHTML += toHex(d0, 2) + toHex(d1, 2) + toHex(d2, 2);
         p.innerHTML += ' ' + toHex(t, 8) + ' ' + delta + '\n';
         msg = [d0, d1, d2];
-        if((d0 & 0xF0) == 0x90){
-          tbl_in.deleteRow(1);
-          --rli_max;
-          --rli_idx;
-        }
+        if((d0 & 0xF0) == 0x90)
+          if(tbl_in.rows.length > 1) tbl_in.deleteRow(1);
         p39.recorder(msg, 1);
         d_out.send(msg);
         if(line < lines.length) setTimeout(ply, slice);
       };
       ply();
     }
+  }
+
+  Pocket39.prototype.ontestplay = function(){
+    el['notes'].innerHTML = '';
+    el['notes_reverse'].innerHTML = sample;
+    p39.onreplay();
   }
 
   Pocket39.prototype.onerase = function(){
@@ -258,13 +257,9 @@
     tbl_out.innerHTML = '';
     tbl_out.insertRow(-1);
     tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
-    rlo_max = 1;
-    rlo_idx = 0;
     tbl_in.innerHTML = '';
     tbl_in.insertRow(-1);
     tbl_in.rows[0].innerHTML = tbl_out.rows[0].innerHTML;
-    rli_max = 1;
-    rli_idx = 0;
   }
 
   Pocket39.prototype.onmousemove = function(ev){
@@ -372,9 +367,9 @@
       rl += '</tr>';
       rl += '</table>';
       el['roll' + roll].innerHTML = rl;
-      tbl_out = document.getElementById('tbl_out');
-      tbl_in = document.getElementById('tbl_in');
     });
+    tbl_out = document.getElementById('tbl_out');
+    tbl_in = document.getElementById('tbl_in');
   }
 
   Pocket39.prototype.getEl = function(ka){
