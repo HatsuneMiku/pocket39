@@ -86,10 +86,8 @@
     el['status'].style.color = c39error;
   }
 
-  Pocket39.prototype.onmidimessage = function(ev){
+  Pocket39.prototype.recorder = function(d, mode){ // mode 0: record, 1: replay
     var tmp = '';
-    var d = ev.data;
-    if(d.length <= 0) return;
     tmp += toHex(d[0], 2) + toHex(d[1], 2) + toHex(d[2], 2);
     tmp += ' ' + toHex(Date.now(), 8);
     bend = d[2] * 256 + d[1];
@@ -116,12 +114,19 @@
     tmp += ' ' + (cmd == 0xE0 ? (flg ? (bend >= 0x4000 ? '+' : '-') : '') : kb_tonestr[tone % 12]);
     tmp += ' ' + (Date.now() - tick);
     tmp += '\n';
-    el['notes'].innerHTML = tmp + el['notes'].innerHTML;
-    el['notes_reverse'].innerHTML += tmp;
+    if(!mode){
+      el['notes'].innerHTML = tmp + el['notes'].innerHTML;
+      el['notes_reverse'].innerHTML += tmp;
+    }
     if(cmd == 0x80) tick = Date.now();
 
     if(cmd == 0x80) p39.noteoff(oct, tone);
     if(cmd == 0x90) p39.noteon(oct, tone);
+  }
+
+  Pocket39.prototype.onmidimessage = function(ev){
+    if(ev.data.length <= 0) return;
+    p39.recorder(ev.data, 0);
   }
 
   Pocket39.prototype.noteoff = function(o, t){
@@ -162,6 +167,7 @@
       var delta = 0;
       var clk = Date.now();
       var ply = function(){
+        var msg = [];
         var l = lines[line];
         var d0 = parseInt(l.substr(0, 2), 16);
         var d1 = parseInt(l.substr(2, 2), 16);
@@ -180,7 +186,9 @@
         }
         p.innerHTML += toHex(d0, 2) + toHex(d1, 2) + toHex(d2, 2);
         p.innerHTML += ' ' + toHex(t, 8) + ' ' + delta + '\n';
-        d_out.send([d0, d1, d2]);
+        msg = [d0, d1, d2];
+        p39.recorder(msg, 1);
+        d_out.send(msg);
         if(line < lines.length) setTimeout(ply, slice);
       };
       ply();

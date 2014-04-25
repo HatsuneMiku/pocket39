@@ -88,6 +88,10 @@ E=G=B=[E=240]R
 
     > pocket39 < README.md
 
+( aike さんの [ミク語変換](http://aikelab.net/mikugo/)
+や [MeCab](http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html)
+と組み合わせれば色々できそう。 )
+
 エクセルでうたう / B#GEC360R
 ----------------------------
 
