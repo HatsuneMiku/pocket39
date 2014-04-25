@@ -14,9 +14,9 @@
   var kb_width = 40;
   var kb_bheight = 80;
   var kb_wheight = 60;
-  var kb_rbwidth = 18;
-  var kb_rwwidth = 26;
-  var kb_rheight = 2;
+  var kb_rbwidth = 20;
+  var kb_rwwidth = 30;
+  var kb_rheight = 4;
   var kb_tonestr = [
     'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -32,6 +32,13 @@
   var vel = 0;
   var dat = 0;
   var cmd = 0;
+
+  var tbl_out = null;
+  var rlo_max = 1;
+  var rlo_idx = 0;
+  var tbl_in = null;
+  var rli_max = 1;
+  var rli_idx = 0;
 
   var el = {};
 
@@ -99,6 +106,7 @@
   }
 
   Pocket39.prototype.recorder = function(d, mode){ // mode 0: record, 1: replay
+    var delta = 0;
     var tmp = '';
     tmp += toHex(d[0], 2) + toHex(d[1], 2) + toHex(d[2], 2);
     tmp += ' ' + toHex(Date.now(), 8);
@@ -120,11 +128,12 @@
       tone = dat + pitch;
       tick = Date.now();
     }
+    delta = Date.now() - tick;
     tmp += ' b' + toHex(cmd == 0xE0 ? (bend - offset) : 0, 4);
     tmp += ' p' + pitch;
     tmp += ' o' + (oct = Math.floor(tone / 12) - 2);
     tmp += ' ' + (cmd == 0xE0 ? (flg ? (bend >= 0x4000 ? '+' : '-') : '') : kb_tonestr[tone % 12]);
-    tmp += ' ' + (Date.now() - tick);
+    tmp += ' ' + delta;
     tmp += '\n';
     if(!mode){
       el['notes'].innerHTML = tmp + el['notes'].innerHTML;
@@ -132,8 +141,8 @@
     }
     if(cmd == 0x80) tick = Date.now();
 
-    if(cmd == 0x80) p39.noteoff(oct, tone);
-    if(cmd == 0x90) p39.noteon(oct, tone);
+    if(cmd == 0x80) p39.noteoff(oct, tone, delta);
+    if(cmd == 0x90) p39.noteon(oct, tone, delta);
   }
 
   Pocket39.prototype.onmidimessage = function(ev){
@@ -141,14 +150,24 @@
     p39.recorder(ev.data, 0);
   }
 
-  Pocket39.prototype.noteoff = function(o, t){
+  Pocket39.prototype.noteoff = function(o, t, d){
     var k = p39.getNoteElement(o, t);
     if(k) k.style.background = k.id[1] == 'b' ? c39gray : c39white;
+    {
+      var n = p39.getNoteNum(o, t);
+      tbl_out.rows[rlo_idx].cells[n].style.height = d / 10;
+    }
   }
 
-  Pocket39.prototype.noteon = function(o, t){
+  Pocket39.prototype.noteon = function(o, t, d){
     var k = p39.getNoteElement(o, t);
     if(k) p39.flashkey(k, c39hilight, 0);
+    {
+      var n = p39.getNoteNum(o, t);
+      tbl_out.insertRow(rlo_idx = rlo_max++);
+      tbl_out.rows[rlo_idx].innerHTML = tbl_out.rows[0].innerHTML;
+      tbl_out.rows[rlo_idx].cells[n].style.background = c39hilight;
+    }
   }
 
   Pocket39.prototype.getNoteElement = function(o, t){
@@ -162,6 +181,11 @@
     }
     r += (o - 4) * kb_oct + kb_notes_first + 1; // why + 1 ?
     return document.getElementById(kb + r);
+  }
+
+  Pocket39.prototype.getNoteNum = function(o, t){
+    // 7 = F start, + 1 means <td> spacer
+    return (t % 12) + (o - 4) * 12 + 7 + 1;
   }
 
   Pocket39.prototype.onsave = function(){
@@ -178,6 +202,16 @@
     var txt = el['notes_reverse'].innerHTML;
     var p = el['notes_play'];
     p.innerHTML = '';
+    {
+      tbl_in.innerHTML = tbl_out.innerHTML;
+      rli_max = rlo_max;
+      rli_idx = rlo_idx;
+      tbl_out.innerHTML = '';
+      tbl_out.insertRow(-1);
+      tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
+      rlo_max = 1;
+      rlo_idx = 0;
+    }
     if(m_oc > 0 && txt != ''){
       var lines = txt.split('\n');
       var line = 0;
@@ -204,6 +238,11 @@
         p.innerHTML += toHex(d0, 2) + toHex(d1, 2) + toHex(d2, 2);
         p.innerHTML += ' ' + toHex(t, 8) + ' ' + delta + '\n';
         msg = [d0, d1, d2];
+        if((d0 & 0xF0) == 0x90){
+          tbl_in.deleteRow(1);
+          --rli_max;
+          --rli_idx;
+        }
         p39.recorder(msg, 1);
         d_out.send(msg);
         if(line < lines.length) setTimeout(ply, slice);
@@ -215,6 +254,17 @@
   Pocket39.prototype.onerase = function(){
     el['notes'].innerHTML = '';
     el['notes_reverse'].innerHTML = '';
+
+    tbl_out.innerHTML = '';
+    tbl_out.insertRow(-1);
+    tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
+    rlo_max = 1;
+    rlo_idx = 0;
+    tbl_in.innerHTML = '';
+    tbl_in.insertRow(-1);
+    tbl_in.rows[0].innerHTML = tbl_out.rows[0].innerHTML;
+    rli_max = 1;
+    rli_idx = 0;
   }
 
   Pocket39.prototype.onmousemove = function(ev){
@@ -293,13 +343,17 @@
   Pocket39.prototype.drawrolls = function(){
     ['out', 'in'].forEach(function(roll){
       var i;
-      var rl = '<table border="0" cellspacing="2" cellpadding="2"';
-      rl += ' bgcolor="' + c39normal + '">';
-      rl += '<tr><td><table border="0" cellspacing="2" cellpadding="1"';
+      var rl = '<table border="0" cellspacing="1" cellpadding="0"';
       rl += ' bgcolor="' + c39normal + '" id="tbl_' + roll + '">';
       rl += '<tr>';
       for(i = 0; i < kb_notes_len + 1; ++i){
         var j = (i + kb_notes_first) % kb_oct;
+        if(i == 0){
+          rl += '<td bgcolor="' + c39normal + '">';
+          rl += '<img src="' + kb_gif + '" border="0"';
+          rl += ' width="' + 4 + '" height="' + kb_rheight + '">';
+          rl += '</td>';
+        }
         if(!(j == 0 || j == 3)){
           var wid = kb_rbwidth;
           if(i == kb_notes_len) wid -= 6;
@@ -316,9 +370,10 @@
         }
       }
       rl += '</tr>';
-      rl += '</table></td></tr>';
       rl += '</table>';
       el['roll' + roll].innerHTML = rl;
+      tbl_out = document.getElementById('tbl_out');
+      tbl_in = document.getElementById('tbl_in');
     });
   }
 
