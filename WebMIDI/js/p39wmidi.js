@@ -4,6 +4,7 @@
   var c39hilight = '#99FFEE';
   var c39hover = '#66CCDD';
   var c39gray = '#333333';
+  var c39lgray = '#CCCCCC';
   var c39white = '#FFFFFF';
   var c39error = '#FF3333';
   var kb_oct = 7;
@@ -13,6 +14,9 @@
   var kb_width = 40;
   var kb_bheight = 80;
   var kb_wheight = 60;
+  var kb_rbwidth = 18;
+  var kb_rwwidth = 26;
+  var kb_rheight = 2;
   var kb_tonestr = [
     'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -49,6 +53,7 @@
       'rollout', 'keyboard', 'rollin',
       'notes', 'notes_reverse', 'notes_play']);
     this.drawkeyboard();
+    this.drawrolls();
     el['replay_opt_0'].onclick = this.onreplayopt;
     el['replay_opt_1'].onclick = this.onreplayopt;
     document.onmousemove = this.onmousemove;
@@ -283,6 +288,38 @@
     kb += '</table></td></tr>';
     kb += '</table>';
     el['keyboard'].innerHTML = kb;
+  }
+
+  Pocket39.prototype.drawrolls = function(){
+    ['out', 'in'].forEach(function(roll){
+      var i;
+      var rl = '<table border="0" cellspacing="2" cellpadding="2"';
+      rl += ' bgcolor="' + c39normal + '">';
+      rl += '<tr><td><table border="0" cellspacing="2" cellpadding="1"';
+      rl += ' bgcolor="' + c39normal + '" id="tbl_' + roll + '">';
+      rl += '<tr>';
+      for(i = 0; i < kb_notes_len + 1; ++i){
+        var j = (i + kb_notes_first) % kb_oct;
+        if(!(j == 0 || j == 3)){
+          var wid = kb_rbwidth;
+          if(i == kb_notes_len) wid -= 6;
+          rl += '<td bgcolor="' + c39lgray + '">';
+          rl += '<img src="' + kb_gif + '" border="0"';
+          rl += ' width="' + wid + '" height="' + kb_rheight + '">';
+          rl += '</td>';
+        }
+        if(i < kb_notes_len){
+          rl += '<td bgcolor="' + c39white + '">';
+          rl += '<img src="' + kb_gif + '" border="0"';
+          rl += ' width="' + kb_rwwidth + '" height="' + kb_rheight + '">';
+          rl += '</td>';
+        }
+      }
+      rl += '</tr>';
+      rl += '</table></td></tr>';
+      rl += '</table>';
+      el['roll' + roll].innerHTML = rl;
+    });
   }
 
   Pocket39.prototype.getEl = function(ka){
