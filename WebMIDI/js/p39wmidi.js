@@ -16,6 +16,7 @@
   var kb_tonestr = [
     'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
+  var slice = 10;
   var tick = 0;
   var range = 0;
   var flg = 0;
@@ -41,9 +42,15 @@
 
   function Pocket39(){
     this.getEl([
-      'm_in', 'm_ic', 'm_out', 'm_oc', 'status', 'info', 'keyboard',
-      'save', 'replay', 'erase', 'notes', 'notes_reverse', 'notes_play']);
+      'm_in', 'm_ic', 'm_out', 'm_oc', 'status', 'info',
+      'save_opt_0', 'save_opt_1', 'save_opt_2', 'save',
+      'replay_opt_v', 'replay_opt_0', 'replay_opt_1', 'replay',
+      'erase',
+      'rollout', 'keyboard', 'rollin',
+      'notes', 'notes_reverse', 'notes_play']);
     this.drawkeyboard();
+    el['replay_opt_0'].onclick = this.onreplayopt;
+    el['replay_opt_1'].onclick = this.onreplayopt;
     document.onmousemove = this.onmousemove;
     document.onkeydown = this.onkeydown;
     global.navigator.requestMIDIAccess({sysex: true}).then(
@@ -156,6 +163,12 @@
     alert('この機能はまだありません');
   }
 
+  Pocket39.prototype.onreplayopt = function(ev){
+    if(el['replay_opt_0'].checked) slice = 10;
+    else if(el['replay_opt_1'].checked) slice = 1;
+    el['replay_opt_v'].innerHTML = '' + slice;
+  }
+
   Pocket39.prototype.onreplay = function(){
     var txt = el['notes_reverse'].innerHTML;
     var p = el['notes_play'];
@@ -163,7 +176,6 @@
     if(m_oc > 0 && txt != ''){
       var lines = txt.split('\n');
       var line = 0;
-      var slice = 10;
       var delta = 0;
       var clk = Date.now();
       var ply = function(){

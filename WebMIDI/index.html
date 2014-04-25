@@ -43,17 +43,47 @@
     <div><img src="./img/p39.png" border="0"></div>
   </td>
 </tr>
+<tr>
+  <td colspan="2">
+<div>
+<table border="0" cellpadding="2" cellspacing="4" width="100%">
+<tr>
+  <td bgcolor="#FFFFFF">
+<form>
+    <input type="radio" id="save_opt_0" name="save_opt" value="0" checked>RAW data
+    <input type="radio" id="save_opt_1" name="save_opt" value="1">SMF ver.0
+    <input type="radio" id="save_opt_2" name="save_opt" value="2">SMF ver.1
+    <input type="button" id="save" value="保存">
+</form>
+  </td>
+  <td bgcolor="#FFFFFF">
+<form>
+    精度 (<span id="replay_opt_v">10</span> msec)
+    <input type="radio" id="replay_opt_0" name="replay_opt" value="0" checked>低
+    <input type="radio" id="replay_opt_1" name="replay_opt" value="1">高
+    <input type="button" id="replay" value="再生">
+</form>
+  </td>
+  <td bgcolor="#FFFFFF">
+<form>
+    <input type="button" id="erase" value="消去">
+</form>
+  </td>
+</tr>
+</table>
+</div>
+  </td>
+</tr>
 </table>
 </div>
 <div>
-<form>
-<input type="button" id="save" value="保存">
-<input type="button" id="replay" value="再生">
-<input type="button" id="erase" value="消去">
-</form>
+<p id="rollout"></p>
 </div>
 <div>
 <p id="keyboard"></p>
+</div>
+<div>
+<p id="rollin"></p>
 </div>
 <div>
 <table border="0" cellpadding="2" cellspacing="2">
