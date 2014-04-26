@@ -1,8 +1,8 @@
 (function(global){
 
-  var c39normal = '#66DDCC';
+  var c39normal = '#0CA39A'; // '#66DDCC';
   var c39hilight = '#99FFEE';
-  var c39hover = '#66CCDD';
+  var c39hover = '#99DDCC'; // '#66CCDD';
   var c39gray = '#333333';
   var c39lgray = '#CCCCCC';
   var c39white = '#FFFFFF';
