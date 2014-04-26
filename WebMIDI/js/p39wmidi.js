@@ -55,7 +55,7 @@
       'save_opt_0', 'save_opt_1', 'save_opt_2', 'save',
       'replay_opt_v', 'replay_opt_0', 'replay_opt_1', 'replay', 'testplay',
       'erase',
-      'rollout', 'keyboard', 'rollin',
+      'rollout_scr', 'rollout', 'keyboard', 'rollin_scr', 'rollin',
       'notes', 'notes_reverse', 'notes_play']);
     this.drawkeyboard();
     this.drawrolls();
@@ -167,6 +167,7 @@
       tbl_out.insertRow(l);
       tbl_out.rows[l].innerHTML = tbl_out.rows[0].innerHTML;
       tbl_out.rows[l].cells[n].style.background = c39hilight;
+      el['rollout_scr'].scrollTop = el['rollout_scr'].scrollHeight;
     }
   }
 
@@ -204,9 +205,11 @@
     p.innerHTML = '';
     {
       tbl_in.innerHTML = tbl_out.innerHTML;
+      el['rollin_scr'].scrollTop = 0;
       tbl_out.innerHTML = '';
       tbl_out.insertRow(-1);
       tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
+      el['rollout_scr'].scrollTop = 0;
     }
     if(m_oc > 0 && txt != ''){
       var lines = txt.split('\n');
@@ -257,9 +260,11 @@
     tbl_out.innerHTML = '';
     tbl_out.insertRow(-1);
     tbl_out.rows[0].innerHTML = tbl_in.rows[0].innerHTML;
+    el['rollout_scr'].scrollTop = 0;
     tbl_in.innerHTML = '';
     tbl_in.insertRow(-1);
     tbl_in.rows[0].innerHTML = tbl_out.rows[0].innerHTML;
+    el['rollin_scr'].scrollTop = 0;
   }
 
   Pocket39.prototype.onmousemove = function(ev){

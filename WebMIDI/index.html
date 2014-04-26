@@ -49,27 +49,29 @@
 <table border="0" cellpadding="2" cellspacing="4" width="100%">
 <tr>
   <td bgcolor="#FFFFFF" valign="top">
-<form>
+    補正
+    <select id="trans_opt" name="trans_opt">
+    <option value="0" selected>しない</option>
+    <option value="1">音名のみ補正(ポケミク以外の楽器で音程ずれるかも)</option>
+    <option value="3">↑に加えて pitch bend sensitivity も補正</option>
+    <option value="7">↑に加えて ベンド中の音も補正</option>
+    </select>
+    <br>
     <input type="radio" id="save_opt_0" name="save_opt" value="0" checked>RAW data
     <input type="radio" id="save_opt_1" name="save_opt" value="1">SMF ver.0
     <input type="radio" id="save_opt_2" name="save_opt" value="2">SMF ver.1
     <input type="button" id="save" value="保存">
-</form>
   </td>
   <td bgcolor="#FFFFFF" valign="top">
-<form>
     精度 (<span id="replay_opt_v">10</span> msec)
     <input type="radio" id="replay_opt_0" name="replay_opt" value="0" checked>低
     <input type="radio" id="replay_opt_1" name="replay_opt" value="1">高
     <input type="button" id="replay" value="再生">
     <br>テストデータで再生
     <input type="button" id="testplay" value="再生(テスト)">
-</form>
   </td>
   <td bgcolor="#FFFFFF" valign="top">
-<form>
     <input type="button" id="erase" value="消去">
-</form>
   </td>
 </tr>
 </table>
@@ -78,13 +80,13 @@
 </tr>
 </table>
 </div>
-<div>
+<div id="rollout_scr" style="overflow-x:hidden; overflow-y:scroll; width:760px; height:180px;">
 <p id="rollout"></p>
 </div>
 <div>
 <p id="keyboard"></p>
 </div>
-<div>
+<div id="rollin_scr" style="overflow-x:hidden; overflow-y:scroll; width:760px; height:180px; ">
 <p id="rollin"></p>
 </div>
 <div>
@@ -95,9 +97,9 @@
   <td>(演奏用)</td>
 </tr>
 <tr>
-  <td><textarea id="notes" rows="10" cols="50"></textarea></td>
-  <td><textarea id="notes_reverse" rows="10" cols="50"></textarea></td>
-  <td><textarea id="notes_play" rows="10" cols="50"></textarea></td>
+  <td><textarea id="notes" rows="5" cols="50"></textarea></td>
+  <td><textarea id="notes_reverse" rows="5" cols="50"></textarea></td>
+  <td><textarea id="notes_play" rows="5" cols="50"></textarea></td>
 </tr>
 </table>
 </div>
