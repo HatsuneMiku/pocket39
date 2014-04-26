@@ -7,6 +7,7 @@
 <script type="text/javascript" src="./js/p39wmidi.js" charset="UTF-8"></script>
 </head>
 <body onLoad="p39_create();">
+<a name="pagetop">
 <div>
 <table border="0" cellpadding="2" cellspacing="2" width="748" bgcolor="#99DDCC">
 <tr>
@@ -16,7 +17,8 @@
 ブラウザは Chrome をお使いください。<br>
  ( Web MIDI API の実行には Chrome の設定変更<br>
  chrome://flags/#enable-web-midi<br>
-と再起動が必要です。 )</p>
+と再起動が必要です。 )<br>
+<font color="#FF3333"><b>下の<a href="#info">注意書き</a>もお読みください。</b></font></p>
 </div>
 <div>
 <table border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
@@ -115,12 +117,17 @@
 補正モード(しない/する/ベンド中の音も補正/ピッチベンドセンシティビティも補正)<br>
 等を変更出来るようにします。<br>
 録音・再生と SMF ファイルのダウンロードを出来るようにします。</p>
+</div>
+<div>
 <p>ソース <a href="http://HatsuneMiku.github.io/pocket39/" target="_blank">http://HatsuneMiku.github.io/pocket39/</a></p>
-<p>既知の問題<br>
+</div>
+<div>
+<p><a name="info">既知の問題</a><br>
 現バージョンでは ポケミク ( NSX-39 ) 以外の MIDI 音源で再生すると音がずれます。<br>
 (これはピッチベンドセンシティビティの補正をまだ行っていないためです。)<br>
 休符(無音期間)が正しくピアノロール表示されていない。<br>
-まだその他バグと未実装の機能あり。</p>
+まだその他バグと未実装の機能あり。<br>
+<a href="#pagetop">top</a>に戻る</p>
 </div>
 </body>
 </html>
