@@ -49,16 +49,26 @@
     return s.substr(s.length - w, w);
   }
 
+  function val2vlv(val){
+    var i, vlv = 0;
+    for(i = 3; i >= 0; --i){
+      var v = (val >> (i * 7)) & 0x7F;
+      vlv |= (v | (((v || vlv) && i) ? 0x080 : 0x00)) << (i * 8);
+    }
+    return vlv;
+  }
+
   function Pocket39(){
     this.getEl([
       'm_in', 'm_ic', 'm_out', 'm_oc', 'status', 'info',
-      'save_opt_0', 'save_opt_1', 'save_opt_2', 'save',
+      'trans_opt', 'save_opt_0', 'save_opt_1', 'save_opt_2', 'save',
       'replay_opt_v', 'replay_opt_0', 'replay_opt_1', 'replay', 'testplay',
       'erase',
       'rollout_scr', 'rollout', 'keyboard', 'rollin_scr', 'rollin',
       'notes', 'notes_reverse', 'notes_play']);
     this.drawkeyboard();
     this.drawrolls();
+    el['trans_opt'].onchange = this.ontransopt;
     el['replay_opt_0'].onclick = this.onreplayopt;
     el['replay_opt_1'].onclick = this.onreplayopt;
     document.onmousemove = this.onmousemove;
@@ -189,8 +199,79 @@
     return (t % 12) + (o - 4) * 12 + 7 + 1;
   }
 
+  Pocket39.prototype.ontransopt = function(ev){
+    if(el['trans_opt'].selectedIndex != 1){
+      alert('(補正)このバージョンでは「音名補正」のみ利用できます');
+      el['trans_opt'].selectedIndex = 1;
+    }
+  }
+
   Pocket39.prototype.onsave = function(){
-    alert('この機能はまだありません');
+    var txt = el['notes_reverse'].innerHTML;
+    if(txt == ''){
+      alert('データがありません。先にスタイラスで演奏してください。');
+    }else{
+      var rsmf = 0;
+      var smfv = 0;
+      var dary = [
+/*
+        0x00, 0x90, 0x4E, 0x7F,
+        0x78, 0x90, 0x52, 0x7F,
+        0x78, 0x90, 0x55, 0x7F,
+        0x81, 0x70, 0x80, 0x4E, 0x00,
+        0x00, 0x80, 0x52, 0x00,
+        0x00, 0x80, 0x55, 0x00
+*/
+      ];
+      var o = document.getElementsByName('save_opt');
+      var i, v = 0;
+      for(i = 0; i < o.length; ++i) if(o[i].checked) v += parseInt(o[i].value);
+      if(v){
+        rsmf = 1;
+        smfv = v - 1;
+      }
+{
+// these codes are almost same as onreplay() and to marge them later
+// but converted recursive call (setTimeout) to loop (must process indirectly)
+      var lines = txt.split('\n');
+      var line = 0;
+      var delta = -1;
+      var u = 0;
+      while(true){
+        var l = lines[line];
+        var d0 = parseInt(l.substr(0, 2), 16);
+        var d1 = parseInt(l.substr(2, 2), 16);
+        var d2 = parseInt(l.substr(4, 2), 16);
+        var t = parseInt(l.substr(7, 8), 16);
+// el['notes'].innerHTML = '' + line + ',' + delta;
+        ++line;
+        if(!l.length) break;
+        if(delta < 0) u = t;
+        delta = t - u;
+        u = t;
+        if(rsmf){
+// must regulate d0 d1 d2 (see Pocket39.prototype.recorder)
+          var i, vlv = val2vlv(delta / 4);
+          for(i = 3; i >= 0; --i){
+            var v = (vlv >> (i * 8)) & 0x0FF;
+            if(v) dary.push(v);
+          }
+          if(!vlv) dary.push(0);
+          dary.push(d0); dary.push(d1); dary.push(d2);
+        }else{
+          dary.push(0); dary.push(d0); dary.push(d1); dary.push(d2);
+          dary.push((t >> 24) & 0x0FF); dary.push((t >> 16) & 0x0FF);
+            dary.push((t >> 8) & 0x0FF); dary.push(t & 0x0FF);
+          dary.push((delta >> 24) & 0x0FF); dary.push((delta >> 16) & 0x0FF);
+            dary.push((delta >> 8) & 0x0FF); dary.push(delta & 0x0FF);
+          dary.push(0);  dary.push(0);  dary.push(0);  dary.push(0);
+        }
+        if(line < lines.length) continue;
+        break;
+      }
+}
+      RAWSMFwriter(rsmf, smfv, new Uint8Array(dary));
+    }
   }
 
   Pocket39.prototype.onreplayopt = function(ev){

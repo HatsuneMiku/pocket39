@@ -5,6 +5,30 @@
 <title>ポケミク Web MIDI API test</title>
 <script type="text/javascript" src="./js/WebMIDIAPI.js" charset="UTF-8"></script>
 <script type="text/javascript" src="./js/p39wmidi.js" charset="UTF-8"></script>
+<script type="text/javascript" src="./js/p39wrsmf.js" charset="UTF-8"></script>
+<script type="text/javascript" src="./js/p39wfile.js" charset="UTF-8"></script>
+<style>
+#progress_bar {
+  margin: 3px 0;
+  padding: 1px;
+  border: 1px solid #000000;
+  font-size: 11px;
+  clear: both;
+  opacity: 0;
+  -moz-transition: opacity 1s linear;
+  -o-transition: opacity 1s linear;
+  -webkit-transition: opacity 1s linear;
+}
+#progress_bar.loading {
+  opacity: 1.0;
+}
+#progress_bar .percent {
+  background-color: #99ccff;
+  height: auto;
+  width: 0;
+  white-space: nowrap;
+}
+</style>
 </head>
 <body onLoad="p39_create();">
 <a name="pagetop">
@@ -51,18 +75,27 @@
 <table border="0" cellpadding="2" cellspacing="4" width="100%">
 <tr>
   <td bgcolor="#FFFFFF" valign="top">
-    補正
+    補正(※現バージョンは下記のノート上は変換されますが保存時に補正されません。)
     <select id="trans_opt" name="trans_opt">
-    <option value="0" selected>しない</option>
-    <option value="1">音名のみ補正(ポケミク以外の楽器で音程ずれるかも)</option>
+    <option value="0">しない</option>
+    <option value="1" selected>音名のみ補正(ポケミク以外の楽器で音程ずれるかも)</option>
     <option value="3">↑に加えて pitch bend sensitivity も補正</option>
     <option value="7">↑に加えて ベンド中の音も補正</option>
+    <option value="15">↑に加えて クォンタイズする</option>
     </select>
     <br>
     <input type="radio" id="save_opt_0" name="save_opt" value="0" checked>RAW data
     <input type="radio" id="save_opt_1" name="save_opt" value="1">SMF ver.0
     <input type="radio" id="save_opt_2" name="save_opt" value="2">SMF ver.1
     <input type="button" id="save" value="保存">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+      <td width="100%"><div id="progress_bar"><div class="percent">0%</div></div></td>
+    </tr>
+    <tr>
+      <td><div id="download"></div></td>
+    </tr>
+    </table>
   </td>
   <td bgcolor="#FFFFFF" valign="top">
     精度 (<span id="replay_opt_v">10</span> msec)

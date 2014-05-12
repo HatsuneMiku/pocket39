@@ -138,4 +138,5 @@ EA[C#E#240]R
 
 - BSD license
 - python フォルダ内のファイルは各種テスト用です。
+- ( [about Standard MIDI format](http://www2s.biglobe.ne.jp/~yyagi/material/smfspec.html) ) SMF についてとても判り易いサイトでした。サイトの著者に感謝いたします。
 - ( [OpenMIDI project](http://openmidiproject.sourceforge.jp/) ) は必須ではありませんが、あると便利。
