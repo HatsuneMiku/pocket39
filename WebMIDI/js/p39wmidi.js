@@ -250,7 +250,8 @@
         delta = t - u;
         u = t;
         if(rsmf){ // SMFdata
-// must regulate d0 d1 d2 (see Pocket39.prototype.recorder)
+// regulate d1 (see Pocket39.prototype.recorder)
+          var dd = parseInt(l.substr(45, 2), 16);
           var i, vlv = val2vlv(delta / 4);
           if(!vlv){
             dary.push(0);
@@ -260,7 +261,9 @@
               if(v) dary.push(v);
             }
           }
-          dary.push(d0); dary.push(d1); dary.push(d2);
+          dary.push(d0);
+          dary.push((d0 & 0xF0) == 0xE0 ? d1 : dd);
+          dary.push(d2);
         }else{ // RAWdata
           if(true){ // binary
             dary.push(0); dary.push(d0); dary.push(d1); dary.push(d2);
@@ -326,6 +329,8 @@
         }
         p.innerHTML += toHex(d0, 2) + toHex(d1, 2) + toHex(d2, 2);
         p.innerHTML += ' ' + toHex(t, 8) + ' ' + delta + '\n';
+// regulate d1 (see Pocket39.prototype.recorder)
+//        d1 = (d0 & 0xF0) == 0xE0 ? d1 : parseInt(l.substr(45, 2), 16); // bug
         msg = [d0, d1, d2];
         if((d0 & 0xF0) == 0x90)
           if(tbl_in.rows.length > 1) tbl_in.deleteRow(1);
