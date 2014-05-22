@@ -129,6 +129,16 @@
     );
   };
 
+  var scr = document.createElement('script');
+  scr.type = 'text/javascript';
+  scr.charset = 'UTF-8';
+  scr.src = './js/p39wfile.js';
+  scr.onerror = function(e){
+    throw new URIError('The script "' + e.target.src + '" is not accessible.');
+  };
+//  scr.onload = function(e){ alert('Loaded: "' + e.target.src + '"'); };
+  document.head.appendChild(scr);
+
   global.RAWSMFwriter = RAWSMFwriter;
 
 }(window));

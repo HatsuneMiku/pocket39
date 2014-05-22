@@ -7,7 +7,6 @@
 <script type="text/javascript" src="./js/p39wsmpl.js" charset="UTF-8"></script>
 <script type="text/javascript" src="./js/p39wmidi.js" charset="UTF-8"></script>
 <script type="text/javascript" src="./js/p39wrsmf.js" charset="UTF-8"></script>
-<script type="text/javascript" src="./js/p39wfile.js" charset="UTF-8"></script>
 <style>
 #progress_bar {
   margin: 3px 0;
@@ -75,8 +74,8 @@
 <div>
 <table border="0" cellpadding="2" cellspacing="4" width="100%">
 <tr>
-  <td bgcolor="#FFFFFF" valign="top">
-    補正(※現バージョンは補正にバグがあります。)
+  <td bgcolor="#FFFFFF" valign="top" width="100%" nowrap>
+    補正(※現バージョンは補正にバグがあります。)<br>
     <select id="trans_opt" name="trans_opt">
     <option value="0">しない</option>
     <option value="1" selected>音名のみ補正(ポケミク以外の楽器で音程ずれるかも)</option>
@@ -98,7 +97,7 @@
     </tr>
     </table>
   </td>
-  <td bgcolor="#FFFFFF" valign="top">
+  <td bgcolor="#FFFFFF" valign="top" nowrap>
     精度 (<span id="replay_opt_v">10</span> msec)
     <input type="radio" id="replay_opt_0" name="replay_opt" value="0" checked>低
     <input type="radio" id="replay_opt_1" name="replay_opt" value="1">高
